@@ -1,0 +1,129 @@
+/* Container do Formulário */
+.formulario {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+/* Título Centralizado */
+.formulario h2 {
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 40px;
+    font-weight: 700;
+}
+
+/* Estilização do campo de Email */
+.campo-formulario {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 25px;
+}
+
+.campo-formulario label {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.campo-formulario input[type="email"] {
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.campo-formulario input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(26, 92, 55, 0.1);
+}
+
+/* Seção de Seleção (Justificada) */
+.campo-selecao {
+    margin-top: 30px;
+    text-align: justify; /* Justifica o bloco de seleção */
+}
+
+.label-principal {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+/* Grupo de Opções */
+.opcoes-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Itens de Radio */
+.opcao-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.opcao-item:hover {
+    background-color: #f9f9f9;
+    color: #00ff6e;
+}
+
+.opcao-item input[type="radio"] {
+    margin-right: 15px;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+/* Responsividade para celulares */
+@media (max-width: 600px) {
+    .formulario {
+        margin: 20px;
+        padding: 10px;
+    }
+    
+    .formulario h2 {
+        font-size: 1.5rem;
+    }
+}
+
+.btn-enviar {
+    width: 100%; /* Ocupa a largura total para facilitar no mobile */
+    background-color: var(--primary-color);
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(26, 92, 55, 0.2);
+}
+
+.btn-enviar:hover {
+    background-color: #2b9e5d; /* Um verde levemente mais escuro */
+    transform: translateY(-2px); /* Efeito de subir levemente */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-enviar:active {
+    transform: translateY(0); /* Volta ao normal ao clicar */
+}
+
+/* Estilo para quando o botão estiver desativado (opcional) */
+.btn-enviar:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}

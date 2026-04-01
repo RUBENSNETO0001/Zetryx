@@ -1,0 +1,70 @@
+/* Configurações Gerais - Fundo Limpo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff; /* Fundo totalmente branco */
+    color: #fcfcfc; /* Cinza azulado escuro para melhor leitura */
+    line-height: 1.8;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Container sem bordas ou sombras pesadas */
+.container-auxilio {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 20px;
+    /* Removido o background branco e a sombra */
+}
+
+/* Cabeçalho Centralizado e Moderno */
+.cabecalho-principal {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee; /* Linha bem fina e sutil */
+}
+
+.cabecalho-principal h1 {
+    color: #00ff6e; /* Verde floresta mais sóbrio */
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.alerta-importante h2 {
+    color: #e67e22; /* Laranja suave (menos agressivo que o vermelho) */
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Corpo do texto - Justificado */
+.conteudo-informativo {
+    text-align: justify;
+    font-size: 1.15rem;
+    color: #ffffff;
+}
+
+.conteudo-informativo p {
+    margin-bottom: 20px;
+}
+
+/* Aviso Legal - Estilo clean sem fundo colorido */
+.aviso-legal {
+    margin-top: 40px;
+    padding: 25px;
+    border: 1px solid #e0e0e0; /* Apenas uma borda fina */
+    border-radius: 8px;
+    background-color: #fdfdfd; /* Um off-white quase imperceptível */
+    color: #000000;
+}
+
+.aviso-legal p {
+    margin-bottom: 0;
+    font-style: italic;
+}
+
+strong {
+    color: #00ff6e; /* Destaques na mesma cor do título */
+    font-weight: 600;
+}
