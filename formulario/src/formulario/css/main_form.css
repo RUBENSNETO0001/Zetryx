@@ -1,80 +1,105 @@
-/* Container do Formulário */
-.formulario {
-    max-width: 700px;
-    margin: 60px auto;
-    padding: 20px;
+/* Container principal */
+.container-formulario {
+    max-width: 640px;
+    margin: 40px auto;
 }
 
-/* Título Centralizado */
-.formulario h2 {
-    text-align: center;
-    color: var(--primary-color);
+/* Cabeçalho estilizado (Estilo Google Forms) */
+header {
+    background-color: var(--card-bg);
+    border-top: 10px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+header h1 {
+    margin: 0 0 10px 0;
     font-size: 2rem;
-    margin-bottom: 40px;
+    color: var(--text-main);
     font-weight: 700;
 }
 
-/* Estilização do campo de Email */
+header p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Seções do formulário (Cards) */
+.formulario-inscricao section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 12px;
+    transition: box-shadow 0.3s ease;
+}
+
+.formulario-inscricao h3 {
+    margin-top: 0;
+    color: var(--text-main);
+    border-bottom: 2px solid var(--bg-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Campos de entrada */
 .campo-formulario {
+    margin-bottom: 25px;
     display: flex;
     flex-direction: column;
-    margin-bottom: 25px;
 }
 
 .campo-formulario label {
     font-weight: 600;
     margin-bottom: 8px;
+    color: var(--text-main);
 }
 
-.campo-formulario input[type="email"] {
-    padding: 12px 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+/* Inputs de Texto, Data, Tel e Email */
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="tel"] {
+    width: 100%;
+    padding: 12px 0; /* Estilo de linha limpa */
+    border: none;
+    border-bottom: 2px solid var(--border-color);
     font-size: 1rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.campo-formulario input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(26, 92, 55, 0.1);
+    transition: all 0.3s;
+    background: transparent;
 }
 
-/* Seção de Seleção (Justificada) */
-.campo-selecao {
-    margin-top: 30px;
-    text-align: justify; /* Justifica o bloco de seleção */
+input:focus {
+    border-bottom: 2px solid var(--primary-color);
+    /* Se preferir o efeito de "caixa" no foco, descomente a linha abaixo: */
+    /* box-shadow: 0 2px 0 0 var(--focus-shadow); */
 }
 
-.label-principal {
-    display: block;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-}
-
-/* Grupo de Opções */
+/* Grupo de Opções (Radios) */
 .opcoes-grupo {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
-/* Itens de Radio */
 .opcao-item {
     display: flex;
     align-items: center;
-    padding: 15px;
-    border: 1px solid var(--border-color);
+    padding: 12px;
+    border: 1px solid transparent; /* Para evitar pulos no hover */
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    font-size: 0.95rem;
+    transition: background 0.2s, border-color 0.2s;
 }
 
 .opcao-item:hover {
-    background-color: #f9f9f9;
-    color: #00ff6e;
+    background-color: #f8f9fa;
+    border-color: var(--border-color);
 }
 
 .opcao-item input[type="radio"] {
@@ -84,20 +109,9 @@
     accent-color: var(--primary-color);
 }
 
-/* Responsividade para celulares */
-@media (max-width: 600px) {
-    .formulario {
-        margin: 20px;
-        padding: 10px;
-    }
-    
-    .formulario h2 {
-        font-size: 1.5rem;
-    }
-}
-
+/* Botão Enviar com os efeitos de hover/active que você criou */
 .btn-enviar {
-    width: 100%; /* Ocupa a largura total para facilitar no mobile */
+    width: 100%; /* Melhor para mobile */
     background-color: var(--primary-color);
     color: white;
     padding: 16px;
@@ -106,24 +120,31 @@
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 20px;
+    margin-bottom: 50px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(26, 92, 55, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn-enviar:hover {
-    background-color: #2b9e5d; /* Um verde levemente mais escuro */
-    transform: translateY(-2px); /* Efeito de subir levemente */
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-enviar:active {
-    transform: translateY(0); /* Volta ao normal ao clicar */
+    transform: translateY(0);
 }
 
-/* Estilo para quando o botão estiver desativado (opcional) */
-.btn-enviar:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-    transform: none;
+/* Responsividade */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .container-formulario {
+        margin: 10px auto;
+    }
+    header h1 {
+        font-size: 1.6rem;
+    }
 }

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import './css/header_form.css'
 import './css/main_form.css'
+import Form_01 from './formularioExtra/EstruturadoFormulario.jsx'
+import Form_02 from './formularioExtra/EstruturadoFormulario02.jsx'
 
 function Informacao_importante() {
     return (
@@ -26,65 +28,16 @@ function Informacao_importante() {
     )
 }
 
-function EstruturadoFormulario() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const dados = Object.fromEntries(formData);
-        console.log("Dados do formulário:", dados);
-        alert("Formulário enviado com sucesso! Verifique o console para os dados.");
-    };
-
+function Formularios() {
+    const [numeroEtapa, setNumeroEtapa] = useState(0);
     return (
         <>
             <div className='formulario'>
-                <h2>Formulário de Inscrição</h2>
-                <form onSubmit={handleSubmit} className="formulario-inscricao">
-                    
-                    <div className="campo-formulario">
-                        <label htmlFor="email">Email:</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="seu.email@exemplo.com"
-                            required
-                        />
-                    </div>
-
-                    <div className="campo-selecao">
-                        <label className="label-principal">Selecione a modalidade de auxílio pretendida:</label>
-
-                        <div className="opcoes-grupo">
-                            <label className="opcao-item">
-                                <input type="radio" name="auxilio" value="permanencia" required />
-                                <span className="custom-radio"></span>
-                                Auxílio Permanência
-                            </label>
-
-                            <label className="opcao-item">
-                                <input type="radio" name="auxilio" value="transporte" />
-                                <span className="custom-radio"></span>
-                                Auxílio Transporte
-                            </label>
-
-                            <label className="opcao-item">
-                                <input type="radio" name="auxilio" value="ambos" />
-                                <span className="custom-radio"></span>
-                                Ambos (Permanência e Transporte)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div className="container-btn">
-                        <button type="submit" className="btn-enviar">
-                            Enviar Inscrição
-                        </button>
-                    </div>
-                </form>
+                {numeroEtapa === 0 && <Form_01 setNumeroEtapa={setNumeroEtapa} />}
+                {numeroEtapa === 1 && <Form_02 setNumeroEtapa={setNumeroEtapa} />}
             </div>
         </>
-    );
+    )
 }
 
 // Componente principal do formulário
@@ -93,7 +46,7 @@ function Formulario() {
         <>
             <div className='formulario'>
                 <Informacao_importante />
-                <EstruturadoFormulario />
+                <Formularios />
             </div>
         </>
     )
