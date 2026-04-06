@@ -1,5 +1,3 @@
-import React from 'react';
-
 function EstruturadoFormulario({ setNumeroEtapa }) {
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -59,7 +57,7 @@ function EstruturadoFormulario({ setNumeroEtapa }) {
 
                 <div className="container-btn">
                     <button type="submit" className="btn-enviar">
-                        Enviar Inscrição
+                        Começa inscrição
                     </button>
                 </div>
                 

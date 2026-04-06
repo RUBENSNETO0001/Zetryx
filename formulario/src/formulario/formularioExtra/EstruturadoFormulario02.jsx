@@ -1,8 +1,15 @@
-const EstruturadoFormulario = () => {
+const EstruturadoFormulario = ({setNumeroEtapa}) => {
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const dados = Object.fromEntries(formData);
+        console.log("Dados do formulário:", dados);
+        setNumeroEtapa(2);
+    };
     return (
         <div className="container-formulario">
 
-            <form className="formulario-inscricao">
+            <form onSubmit={handleSubmit} className="formulario-inscricao">
                 <section>
                     <h3>Dados Pessoais</h3>
 
@@ -97,7 +104,7 @@ const EstruturadoFormulario = () => {
                     </div>
                 </section>
                 
-                <button type="submit" className="btn-enviar">Enviar Dados</button>
+                <button type="submit" className="btn-enviar">ir para etapa 2</button>
             </form>
         </div>
     );

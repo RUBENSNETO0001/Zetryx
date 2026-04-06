@@ -3,7 +3,7 @@ import './css/header_form.css'
 import './css/main_form.css'
 import Form_01 from './formularioExtra/EstruturadoFormulario.jsx'
 import Form_02 from './formularioExtra/EstruturadoFormulario02.jsx'
-
+import Form_03 from './formularioExtra/EstruturadoFormulario03.jsx'
 function Informacao_importante() {
     return (
         <>
@@ -39,6 +39,7 @@ function Formularios() {
             <div className='formulario'>
                 {numeroEtapa === 0 && <Form_01 setNumeroEtapa={setNumeroEtapa} />}
                 {numeroEtapa === 1 && <Form_02 setNumeroEtapa={setNumeroEtapa} />}
+                {numeroEtapa === 2 && <Form_03 setNumeroEtapa={setNumeroEtapa} />}
             </div>
         </>
     )
