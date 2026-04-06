@@ -1,9 +1,12 @@
-const EstruturadoFormulario = () => {
+const EstruturadoFormulario = ({ setNumeroEtapa }) => {
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        setNumeroEtapa(3);
+    };
+
     return (
         <div className="container-formulario">
             <form className="formulario-inscricao">
-                
-                {/* --- SEÇÃO: REQUISITOS DE PARTICIPAÇÃO --- */}
                 <section>
                     <div className="cabecalho-verde">
                         <h3>Informações primarias</h3>

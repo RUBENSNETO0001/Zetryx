@@ -1,10 +1,7 @@
 function EstruturadoFormulario({ setNumeroEtapa }) {
     const handleSubmit = (event) => {
         event.preventDefault();
-        const formData = new FormData(event.target);
-        const dados = Object.fromEntries(formData);
-        console.log("Dados do formulário:", dados);
-        alert("Formulário enviado com sucesso! Verifique o console para os dados.");
+        alert("Início da inscrição. Verifique sua caixa de email para acompanhar o processo.");
         setNumeroEtapa(1);
     };
 
