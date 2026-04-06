@@ -1,150 +1,130 @@
-/* Container principal */
 .container-formulario {
-    max-width: 640px;
+    color: #ffffff;
+    max-width: 600px;
     margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 115, 255, 0.1);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Cabeçalho estilizado (Estilo Google Forms) */
-header {
-    background-color: var(--card-bg);
-    border-top: 10px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-}
-
-header h1 {
-    margin: 0 0 10px 0;
-    font-size: 2rem;
-    color: var(--text-main);
-    font-weight: 700;
-}
-
-header p {
-    color: var(--text-secondary);
-    margin: 0;
-    font-size: 1rem;
-}
-
-/* Seções do formulário (Cards) */
-.formulario-inscricao section {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 12px;
-    transition: box-shadow 0.3s ease;
-}
-
-.formulario-inscricao h3 {
-    margin-top: 0;
-    color: var(--text-main);
-    border-bottom: 2px solid var(--bg-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-/* Campos de entrada */
-.campo-formulario {
-    margin-bottom: 25px;
+.formulario-inscricao {
     display: flex;
     flex-direction: column;
+    gap: 20px;
 }
 
-.campo-formulario label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--text-main);
+section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* Inputs de Texto, Data, Tel e Email */
-input[type="text"],
-input[type="email"],
-input[type="date"],
-input[type="tel"] {
-    width: 100%;
-    padding: 12px 0; /* Estilo de linha limpa */
-    border: none;
-    border-bottom: 2px solid var(--border-color);
+h3 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    border-left: 4px solid #3498db;
+    padding-left: 10px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 10px 0;
+}
+
+.campo-formulario :is(input[type="text"], input[type="email"], input[type="date"], input[type="tel"]) {
+    width: 100%; /* Garante que o input ocupe todo o espaço disponível */
+    padding: 12px 16px;
+    border: 1.5px solid #e0e0e0; /* Bordas levemente mais nítidas */
+    border-radius: 8px;
     font-size: 1rem;
+    color: #333;
+    background-color: rgba(0, 115, 255, 0.1);
+    box-sizing: border-box; /* Essencial para o padding não "quebrar" a largura */
+    transition: 
+        border-color 0.2s ease-in-out, 
+        box-shadow 0.2s ease-in-out, 
+        background-color 0.2s ease-in-out;
+}
+
+.campo-formulario :is(input[type="text"], input[type="email"], input[type="date"], input[type="tel"]):hover {
+    border-color: #b0b0b0;
+}
+
+.campo-formulario :is(input[type="text"], input[type="email"], input[type="date"], input[type="tel"]):focus {
     outline: none;
-    transition: all 0.3s;
-    background: transparent;
+    border-color: #3498db;
+    background-color: #e9e9e9;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
 }
 
-input:focus {
-    border-bottom: 2px solid var(--primary-color);
-    /* Se preferir o efeito de "caixa" no foco, descomente a linha abaixo: */
-    /* box-shadow: 0 2px 0 0 var(--focus-shadow); */
-}
-
-/* Grupo de Opções (Radios) */
 .opcoes-grupo {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    margin-top: 5px;
 }
 
 .opcao-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    border: 1px solid transparent; /* Para evitar pulos no hover */
-    border-radius: 8px;
     cursor: pointer;
     font-size: 0.95rem;
-    transition: background 0.2s, border-color 0.2s;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
 }
 
 .opcao-item:hover {
-    background-color: #f8f9fa;
-    border-color: var(--border-color);
+    background-color: #222222;
+    color: #219150;
 }
 
 .opcao-item input[type="radio"] {
-    margin-right: 15px;
-    width: 20px;
-    height: 20px;
-    accent-color: var(--primary-color);
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
-/* Botão Enviar com os efeitos de hover/active que você criou */
+/* Input inline (para a opção "Outro") */
+.input-inline {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.container-btn {
+    margin-top: 10px;
+}
+
 .btn-enviar {
-    width: 100%; /* Melhor para mobile */
-    background-color: var(--primary-color);
+    width: 100%;
+    padding: 14px;
+    background-color: #27ae60;
     color: white;
-    padding: 16px;
     border: none;
     border-radius: 8px;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
-    margin-top: 20px;
-    margin-bottom: 50px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.1s;
 }
 
 .btn-enviar:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #219150;
 }
 
 .btn-enviar:active {
-    transform: translateY(0);
+    transform: scale(0.98);
 }
 
-/* Responsividade */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
+@media (max-width: 480px) {
     .container-formulario {
-        margin: 10px auto;
-    }
-    header h1 {
-        font-size: 1.6rem;
+        margin: 10px;
+        padding: 15px;
     }
 }

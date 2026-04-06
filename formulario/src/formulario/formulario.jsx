@@ -23,6 +23,10 @@ function Informacao_importante() {
                         <p>Todas as perguntas devem ser respondidas com total responsabilidade com a veracidade das informações, considerando o <strong>Decreto-Lei nº 2.848/40, Art. 299</strong>. Lembre-se que informações falsas podem prejudicar outras pessoas que possam estar em situação socioeconomicamente mais vulnerável.</p>
                     </div>
                 </main>
+                <footer>
+                    <h1>Formulário de Inscrição</h1>
+                    <p>Preencha o formulário abaixo para se inscrever no evento.</p>
+                </footer>
             </div>
         </>
     )

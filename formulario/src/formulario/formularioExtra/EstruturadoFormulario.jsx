@@ -1,4 +1,6 @@
-function EstruturadoFormulario({setNumeroEtapa}) {
+import React from 'react';
+
+function EstruturadoFormulario({ setNumeroEtapa }) {
     const handleSubmit = (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
@@ -9,11 +11,11 @@ function EstruturadoFormulario({setNumeroEtapa}) {
     };
 
     return (
-        <>
-            <div className='formulario'>
-                <h2>Formulário de Inscrição</h2>
-                <form onSubmit={handleSubmit} className="formulario-inscricao">
-                    
+        <div className="container-formulario">
+            <form onSubmit={handleSubmit} className="formulario-inscricao">
+                
+                <section>
+                    <h3>Informações de Contato</h3>
                     <div className="campo-formulario">
                         <label htmlFor="email">Email:</label>
                         <input
@@ -24,10 +26,15 @@ function EstruturadoFormulario({setNumeroEtapa}) {
                             required
                         />
                     </div>
+                </section>
 
-                    <div className="campo-selecao">
+                <hr />
+
+                <section>
+                    <h3>Modalidade</h3>
+                    <div className="campo-formulario">
                         <label className="label-principal">Selecione a modalidade de auxílio pretendida:</label>
-
+                        
                         <div className="opcoes-grupo">
                             <label className="opcao-item">
                                 <input type="radio" name="auxilio" value="permanencia" required />
@@ -48,15 +55,17 @@ function EstruturadoFormulario({setNumeroEtapa}) {
                             </label>
                         </div>
                     </div>
+                </section>
 
-                    <div className="container-btn">
-                        <button type="submit" className="btn-enviar">
-                            Enviar Inscrição
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </>
+                <div className="container-btn">
+                    <button type="submit" className="btn-enviar">
+                        Enviar Inscrição
+                    </button>
+                </div>
+                
+            </form>
+        </div>
     );
 }
+
 export default EstruturadoFormulario;

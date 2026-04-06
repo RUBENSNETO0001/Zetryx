@@ -1,12 +1,6 @@
-import React from 'react';
-
 const EstruturadoFormulario = () => {
     return (
         <div className="container-formulario">
-            <header>
-                <h1>Formulário de Inscrição</h1>
-                <p>Preencha o formulário abaixo para se inscrever no evento.</p>
-            </header>
 
             <form className="formulario-inscricao">
                 <section>
