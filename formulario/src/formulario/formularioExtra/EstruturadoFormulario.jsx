@@ -8,7 +8,7 @@ function EstruturadoFormulario({ setNumeroEtapa }) {
     return (
         <div className="container-formulario">
             <form onSubmit={handleSubmit} className="formulario-inscricao">
-                
+
                 <section>
                     <h3>Informações de Contato</h3>
                     <div className="campo-formulario">
@@ -29,7 +29,7 @@ function EstruturadoFormulario({ setNumeroEtapa }) {
                     <h3>Modalidade</h3>
                     <div className="campo-formulario">
                         <label className="label-principal">Selecione a modalidade de auxílio pretendida:</label>
-                        
+
                         <div className="opcoes-grupo">
                             <label className="opcao-item">
                                 <input type="radio" name="auxilio" value="permanencia" required />
@@ -57,7 +57,7 @@ function EstruturadoFormulario({ setNumeroEtapa }) {
                         Começa inscrição
                     </button>
                 </div>
-                
+
             </form>
         </div>
     );

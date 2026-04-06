@@ -1,4 +1,4 @@
-const EstruturadoFormulario = ({setNumeroEtapa}) => {
+const EstruturadoFormulario = ({ setNumeroEtapa }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setNumeroEtapa(2);
@@ -100,7 +100,7 @@ const EstruturadoFormulario = ({setNumeroEtapa}) => {
                         <input type="text" id="cep" name="cep" placeholder="69900-000" required />
                     </div>
                 </section>
-                
+
                 <button type="submit" className="btn-enviar">ir para etapa 2</button>
             </form>
         </div>
