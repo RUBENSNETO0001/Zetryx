@@ -4,6 +4,9 @@ import './css/main_form.css'
 import Form_01 from './formularioExtra/EstruturadoFormulario.jsx'
 import Form_02 from './formularioExtra/EstruturadoFormulario02.jsx'
 import Form_03 from './formularioExtra/EstruturadoFormulario03.jsx'
+import Form_04 from './formularioExtra/EstruturadoFormulario04.jsx'
+import Form_05 from './formularioExtra/EstruturadoFormulario05.jsx'
+
 function Informacao_importante() {
     return (
         <>
@@ -31,7 +34,15 @@ function Informacao_importante() {
         </>
     )
 }
-
+function embreve(){
+    return(
+        <div className="container-auxilio">
+            <header className="cabecalho-principal">
+                <h3>Em breve o resto</h3>
+            </header>
+        </div>
+    )
+}
 function Formularios() {
     const [numeroEtapa, setNumeroEtapa] = useState(0);
     return (
@@ -40,6 +51,9 @@ function Formularios() {
                 {numeroEtapa === 0 && <Form_01 setNumeroEtapa={setNumeroEtapa} />}
                 {numeroEtapa === 1 && <Form_02 setNumeroEtapa={setNumeroEtapa} />}
                 {numeroEtapa === 2 && <Form_03 setNumeroEtapa={setNumeroEtapa} />}
+                {numeroEtapa === 3 && <Form_04 setNumeroEtapa={setNumeroEtapa} />}
+                {numeroEtapa === 4 && <Form_05 setNumeroEtapa={setNumeroEtapa} />}
+                {numeroEtapa === 5 && <embreve />}
             </div>
         </>
     )

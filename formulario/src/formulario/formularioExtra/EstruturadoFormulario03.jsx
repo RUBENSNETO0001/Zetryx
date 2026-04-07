@@ -6,7 +6,7 @@ const EstruturadoFormulario = ({ setNumeroEtapa }) => {
 
     return (
         <div className="container-formulario">
-            <form className="formulario-inscricao">
+            <form className="formulario-inscricao" onSubmit={handleSubmit}>
                 <section>
                     <div className="cabecalho-verde">
                         <h3>Informações primarias</h3>
