@@ -88,6 +88,80 @@ const EstruturadoFormularioSocioeconomico = ({ setNumeroEtapa }) => {
                         </div>
                     </div>
                 </section>
+                <section>
+                    <div className="campo-formulario">
+                        <label>mora em? *</label>
+                        <div className="opcoes-grupo">
+                            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="urbana" required /><span className="custom-radio"></span> Zona urbana</label>
+                            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="rural" /><span className="custom-radio"></span> Zona rural</label>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div className="campo-formulario">
+                        <label>mora em? *</label>
+                        <div className="opcoes-grupo">
+                            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="urbana" required /><span className="custom-radio"></span> Zona urbana</label>
+                            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="rural" /><span className="custom-radio"></span> Zona rural</label>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div className="campo-formulario">
+                        <label>Sua família é beneficiária do programa Bolsa Família ou está inscrita no Cadúnico? *</label>
+                        <div className="opcoes-grupo">
+                            <label className="opcao-item">
+                                <input type="radio" name="bolsaFamilia" value="sim" required />
+                                <span className="custom-radio"></span> Sim
+                            </label>
+                            <label className="opcao-item">
+                                <input type="radio" name="bolsaFamilia" value="nao" />
+                                <span className="custom-radio"></span> Não
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <div className="campo-formulario">
+                        <label>Sua família é beneficiária do Benefício de Prestação Continuada - BPC? *</label>
+                        <div className="opcoes-grupo">
+                            <label className="opcao-item">
+                                <input type="radio" name="beneficioBpc" value="sim" required />
+                                <span className="custom-radio"></span> Sim
+                            </label>
+                            <label className="opcao-item">
+                                <input type="radio" name="beneficioBpc" value="nao" />
+                                <span className="custom-radio"></span> Não
+                            </label>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div className="campo-formulario">
+                        <label>Qual a renda bruta TOTAL da família neste momento? (Apenas valor inteiro) *</label>
+                        <input type="number" name="rendaBruta" placeholder="0" required className="input-linha" />
+                    </div>
+                </section>
+
+                <section>
+                    <div className="campo-formulario">
+                        <label>Quantas pessoas moram na sua casa (incluindo você)? *</label>
+                        <input type="number" name="qtdPessoas" placeholder="1" required className="input-linha" />
+                    </div>
+                </section>
+
+                <section>
+                    <div className="campo-formulario">
+                        <label>Descreva abaixo as informações de cada pessoa (Nome, parentesco, idade, profissão, vínculo e renda): *</label>
+                        <textarea
+                            name="descricaoFamiliar"
+                            placeholder="Ex: Fulano de tal, irmão, 22 anos, pedreiro, CLT, R$ 2.000"
+                            required
+                            className="textarea-linha"
+                        ></textarea>
+                    </div>
+                </section>
 
                 <button type="submit" className="btn-enviar">ir para etapa 3</button>
             </form>

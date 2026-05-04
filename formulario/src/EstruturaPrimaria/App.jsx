@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import './App.css'
-import Formulario from './formulario/formulario'
+import Form from './formulario/FormularioCompleto.jsx'
+
 function App() {
   return (
     <>
-     <Formulario />
+     <Form />
     </>
   )
 }

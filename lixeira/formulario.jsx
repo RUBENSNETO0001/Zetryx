@@ -6,7 +6,8 @@ import Form_02 from './formularioExtra/EstruturadoFormulario02.jsx'
 import Form_03 from './formularioExtra/EstruturadoFormulario03.jsx'
 import Form_04 from './formularioExtra/EstruturadoFormulario04.jsx'
 import Form_05 from './formularioExtra/EstruturadoFormulario05.jsx'
-
+import Form_06 from './formularioExtra/EstruturadoFormulario06.jsx'
+import Form_07 from './formularioExtra/EstruturadoFormulario07.jsx'
 function Informacao_importante() {
     return (
         <>
@@ -53,13 +54,13 @@ function Formularios() {
                 {numeroEtapa === 2 && <Form_03 setNumeroEtapa={setNumeroEtapa} />}
                 {numeroEtapa === 3 && <Form_04 setNumeroEtapa={setNumeroEtapa} />}
                 {numeroEtapa === 4 && <Form_05 setNumeroEtapa={setNumeroEtapa} />}
-                {numeroEtapa === 5 && <embreve />}
+                {numeroEtapa === 5 && <Form_06 setNumeroEtapa={setNumeroEtapa} />}
+                {numeroEtapa === 6 && <Form_07 setNumeroEtapa={setNumeroEtapa} />}
             </div>
         </>
     )
 }
 
-// Componente principal do formulário
 function Formulario() {
     return (
         <>
