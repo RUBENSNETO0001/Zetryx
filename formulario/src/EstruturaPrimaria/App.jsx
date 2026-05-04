@@ -5,7 +5,7 @@ import Form from './formulario/FormularioCompleto.jsx'
 function App() {
   return (
     <>
-     <Form />
+      <Form />
     </>
   )
 }

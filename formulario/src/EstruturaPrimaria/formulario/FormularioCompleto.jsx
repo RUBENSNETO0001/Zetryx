@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import './FormularioCompleto.css';
-/* ─────────────────────────────────────────────
-   DADOS DE ETAPAS
-───────────────────────────────────────────── */
+// DADOS DE ETAPAS
 const ETAPAS = [
   'Início',
   'Dados Pessoais',
@@ -13,9 +11,7 @@ const ETAPAS = [
   'Termo',
 ];
 
-/* ─────────────────────────────────────────────
-   COMPONENTE: Barra de Progresso
-───────────────────────────────────────────── */
+// COMPONENTE: Barra de Progresso
 function BarraProgresso({ etapa }) {
   const total = ETAPAS.length;
   const pct = Math.round((etapa / (total - 1)) * 100);
@@ -459,7 +455,7 @@ function TelaSucesso() {
 
 // COMPONENTE RAIZ
 export default function Formulario() {
-  const [etapa, setEtapa] = useState(-1); // -1 = tela informativa
+  const [etapa, setEtapa] = useState(-1); 
   const avancar = () => setEtapa((e) => e + 1);
 
   const etapas = [
