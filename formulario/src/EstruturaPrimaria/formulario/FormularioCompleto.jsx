@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import './FormularioCompleto.css';
- 
+
 const ETAPAS = [
   'Início',
   'Dados Pessoais',
@@ -11,7 +11,7 @@ const ETAPAS = [
   'Documentos',
   'Termo',
 ];
- 
+
 // COMPONENTE: Barra de Progresso
 function BarraProgresso({ etapa }) {
   const total = ETAPAS.length;
@@ -39,7 +39,7 @@ function BarraProgresso({ etapa }) {
     </div>
   );
 }
- 
+
 // ETAPA 0 – Início / Modalidade
 function Etapa0({ avancar }) {
   const handleSubmit = (e) => {
@@ -79,7 +79,7 @@ function Etapa0({ avancar }) {
     </form>
   );
 }
- 
+
 // ETAPA 1 – Dados Pessoais + Endereço
 function Etapa1({ avancar }) {
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
@@ -135,12 +135,12 @@ function Etapa1({ avancar }) {
       <section>
         <h3>Endereço</h3>
         {[
-          ['cidade',      'text', 'Cidade *',       'Rio Branco',        true],
-          ['rua',         'text', 'Rua *',           'Nome da rua',       true],
-          ['numero',      'text', 'Número *',        'Ex: 123',           true],
-          ['bairro',      'text', 'Bairro *',        'Seu bairro',        true],
-          ['complemento', 'text', 'Complemento',     'Apto, Bloco, etc.', false],
-          ['cep',         'text', 'CEP *',           '69900-000',         true],
+          ['cidade', 'text', 'Cidade *', 'Rio Branco', true],
+          ['rua', 'text', 'Rua *', 'Nome da rua', true],
+          ['numero', 'text', 'Número *', 'Ex: 123', true],
+          ['bairro', 'text', 'Bairro *', 'Seu bairro', true],
+          ['complemento', 'text', 'Complemento', 'Apto, Bloco, etc.', false],
+          ['cep', 'text', 'CEP *', '69900-000', true],
         ].map(([id, type, label, ph, req]) => (
           <div className="campo-formulario" key={id}>
             <label htmlFor={id}>{label}</label>
@@ -152,7 +152,7 @@ function Etapa1({ avancar }) {
     </form>
   );
 }
- 
+
 // ETAPA 2 – Critérios de Elegibilidade
 function Etapa2({ avancar }) {
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
@@ -206,7 +206,7 @@ function Etapa2({ avancar }) {
     </form>
   );
 }
- 
+
 // ETAPA 3 – Dados Bancários
 function Etapa3({ avancar }) {
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
@@ -267,7 +267,7 @@ function Etapa3({ avancar }) {
     </form>
   );
 }
- 
+
 // ─── COMPONENTE AUXILIAR: Card de membro da família ───────────────────────────
 const MEMBRO_VAZIO = {
   nome: '',
@@ -279,13 +279,13 @@ const MEMBRO_VAZIO = {
   possuiDeficiencia: false,
   possuiDoencaCronica: false,
 };
- 
+
 function CardMembro({ index, membro, onChange, onRemover, podRemover }) {
   const handle = (campo) => (e) => {
     const valor = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     onChange(index, campo, valor);
   };
- 
+
   return (
     <div className="card-membro">
       <div className="card-membro-header">
@@ -312,7 +312,7 @@ function CardMembro({ index, membro, onChange, onRemover, podRemover }) {
           <label>Parentesco *</label>
           <select value={membro.parentesco} onChange={handle('parentesco')} required>
             <option value="">Selecione…</option>
-            {['Pai','Mãe','Cônjuge/Companheiro(a)','Filho(a)','Irmão/Irmã','Avô/Avó','Tio(a)','Outro'].map(p => (
+            {['Pai', 'Mãe', 'Cônjuge/Companheiro(a)', 'Filho(a)', 'Irmão/Irmã', 'Avô/Avó', 'Tio(a)', 'Outro'].map(p => (
               <option key={p} value={p.toLowerCase()}>{p}</option>
             ))}
           </select>
@@ -329,7 +329,7 @@ function CardMembro({ index, membro, onChange, onRemover, podRemover }) {
           <label>Vínculo empregatício</label>
           <select value={membro.vinculo} onChange={handle('vinculo')}>
             <option value="">Selecione…</option>
-            {['CLT','Servidor público','Autônomo','Informal','Desempregado(a)','Aposentado(a)','Pensionista','Estudante','Outro'].map(v => (
+            {['CLT', 'Servidor público', 'Autônomo', 'Informal', 'Desempregado(a)', 'Aposentado(a)', 'Pensionista', 'Estudante', 'Outro'].map(v => (
               <option key={v} value={v.toLowerCase()}>{v}</option>
             ))}
           </select>
@@ -353,18 +353,18 @@ function CardMembro({ index, membro, onChange, onRemover, podRemover }) {
     </div>
   );
 }
- 
+
 // ETAPA 4 – Dados Socioeconômicos
 function Etapa4({ avancar }) {
   const [membros, setMembros] = useState([{ ...MEMBRO_VAZIO }]);
- 
+
   const handleMembro = (index, campo, valor) =>
     setMembros(prev => prev.map((m, i) => i === index ? { ...m, [campo]: valor } : m));
- 
+
   const adicionarMembro = () => setMembros(prev => [...prev, { ...MEMBRO_VAZIO }]);
   const removerMembro = (index) => setMembros(prev => prev.filter((_, i) => i !== index));
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
- 
+
   return (
     <form onSubmit={handleSubmit} className="formulario-inscricao">
       <section>
@@ -375,8 +375,8 @@ function Etapa4({ avancar }) {
         <div className="campo-formulario">
           <label>Em quantas disciplinas você está matriculado? *</label>
           <div className="opcoes-grupo">
-            {[['uma','Em apenas uma'],['duas','Em duas disciplinas'],['mais_duas','Em mais de duas disciplinas'],
-              ['tcc','Apenas em fase de elaboração de TCC'],['estagio','Apenas fazendo estágio curricular']].map(([v,t]) => (
+            {[['uma', 'Em apenas uma'], ['duas', 'Em duas disciplinas'], ['mais_duas', 'Em mais de duas disciplinas'],
+            ['tcc', 'Apenas em fase de elaboração de TCC'], ['estagio', 'Apenas fazendo estágio curricular']].map(([v, t]) => (
               <label key={v} className="opcao-item"><input type="radio" name="qtdDisciplinas" value={v} required /> {t}</label>
             ))}
           </div>
@@ -391,9 +391,9 @@ function Etapa4({ avancar }) {
         <div className="campo-formulario">
           <label>Se sim, informe qual(is) auxílio(s):</label>
           <div className="opcoes-grupo">
-            {[['extensao','Bolsa de extensão'],['pesquisa','Bolsa de pesquisa'],['pibid','PIBID'],
-              ['residencia','Residência pedagógica'],['monitoria','Monitoria'],
-              ['ensino','Bolsa de Projeto de Ensino'],['pe-de-meia','Pé-de-meia']].map(([v,t]) => (
+            {[['extensao', 'Bolsa de extensão'], ['pesquisa', 'Bolsa de pesquisa'], ['pibid', 'PIBID'],
+            ['residencia', 'Residência pedagógica'], ['monitoria', 'Monitoria'],
+            ['ensino', 'Bolsa de Projeto de Ensino'], ['pe-de-meia', 'Pé-de-meia']].map(([v, t]) => (
               <label key={v} className="opcao-item"><input type="checkbox" name="tipoBolsa" value={v} /> {t}</label>
             ))}
           </div>
@@ -407,9 +407,9 @@ function Etapa4({ avancar }) {
         <div className="campo-formulario">
           <label>Há pessoas com deficiência na sua família? *</label>
           <div className="opcoes-grupo">
-            {[['nenhuma','Não há pessoas com deficiência na minha família'],['intelectual','Deficiência intelectual'],
-              ['auditiva','Deficiência auditiva'],['visual','Deficiência visual'],
-              ['tgd','Transtorno Global de Desenvolvimento'],['fisica','Deficiência física']].map(([v,t]) => (
+            {[['nenhuma', 'Não há pessoas com deficiência na minha família'], ['intelectual', 'Deficiência intelectual'],
+            ['auditiva', 'Deficiência auditiva'], ['visual', 'Deficiência visual'],
+            ['tgd', 'Transtorno Global de Desenvolvimento'], ['fisica', 'Deficiência física']].map(([v, t]) => (
               <label key={v} className="opcao-item"><input type="checkbox" name="pcdFamilia" value={v} /> {t}</label>
             ))}
           </div>
@@ -417,10 +417,10 @@ function Etapa4({ avancar }) {
         <div className="campo-formulario">
           <label>Há pessoas com alguma doença grave ou crônica na sua família? *</label>
           <div className="opcoes-grupo">
-            {[['nenhuma','Nenhuma'],['tuberculose','Tuberculose ativa'],['hanseniase','Hanseníase'],
-              ['alienacao_mental','Transtorno mental grave'],['cancer','Neoplasia maligna (câncer)'],
-              ['cegueira','Cegueira'],['paralisia','Paralisia irreversível'],['cardiopatia','Cardiopatia grave'],
-              ['parkinson','Doença de Parkinson'],['aids','AIDS'],['esclerose','Esclerose múltipla']].map(([v,t]) => (
+            {[['nenhuma', 'Nenhuma'], ['tuberculose', 'Tuberculose ativa'], ['hanseniase', 'Hanseníase'],
+            ['alienacao_mental', 'Transtorno mental grave'], ['cancer', 'Neoplasia maligna (câncer)'],
+            ['cegueira', 'Cegueira'], ['paralisia', 'Paralisia irreversível'], ['cardiopatia', 'Cardiopatia grave'],
+            ['parkinson', 'Doença de Parkinson'], ['aids', 'AIDS'], ['esclerose', 'Esclerose múltipla']].map(([v, t]) => (
               <label key={v} className="opcao-item"><input type="checkbox" name="doencaFamilia" value={v} /> {t}</label>
             ))}
           </div>
@@ -491,17 +491,17 @@ function Etapa4({ avancar }) {
     </form>
   );
 }
- 
+
 // ETAPA 5 – Curso Superior
 function Etapa5({ avancar }) {
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
   const cursos = [
-    ['ads',           'Análise e Desenvolvimento de Sistemas'],
-    ['enfermagem',    'Enfermagem'],
-    ['agronomia',     'Agronomia'],
-    ['gestao_publica','Gestão Pública'],
-    ['letras',        'Letras – Língua Portuguesa'],
-    ['outro',         'Outro'],
+    ['ads', 'Análise e Desenvolvimento de Sistemas'],
+    ['enfermagem', 'Enfermagem'],
+    ['agronomia', 'Agronomia'],
+    ['gestao_publica', 'Gestão Pública'],
+    ['letras', 'Letras – Língua Portuguesa'],
+    ['outro', 'Outro'],
   ];
   return (
     <form onSubmit={handleSubmit} className="formulario-inscricao">
@@ -526,30 +526,30 @@ function Etapa5({ avancar }) {
     </form>
   );
 }
- 
+
 // ─── COMPONENTE AUXILIAR: Card de documento ───────────────────────────────────
 const DOC_VAZIO = () => ({ id: Date.now() + Math.random(), nome: '', arquivo: null });
- 
+
 function CardDocumento({ doc, onChange, onRemover, podRemover }) {
   const inputFileRef = useRef();
- 
+
   const handleArquivo = (e) => {
     const arquivo = e.target.files[0];
     if (!arquivo) return;
     onChange(doc.id, 'arquivo', arquivo);
   };
- 
+
   const removerArquivo = () => {
     onChange(doc.id, 'arquivo', null);
     if (inputFileRef.current) inputFileRef.current.value = '';
   };
- 
+
   const formatSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1048576) return (bytes / 1024).toFixed(0) + ' KB';
     return (bytes / 1048576).toFixed(1) + ' MB';
   };
- 
+
   return (
     <div className="card-membro">
       {/* Header com nome editável — mesmo padrão do CardMembro */}
@@ -572,7 +572,7 @@ function CardDocumento({ doc, onChange, onRemover, podRemover }) {
           </button>
         )}
       </div>
- 
+
       {/* Corpo: zona de upload ou preview do arquivo */}
       <div className="card-doc-corpo">
         {!doc.arquivo ? (
@@ -612,22 +612,22 @@ function CardDocumento({ doc, onChange, onRemover, podRemover }) {
     </div>
   );
 }
- 
+
 // ETAPA 6 – Documentos
 function Etapa6({ avancar }) {
   const [docs, setDocs] = useState([{ ...DOC_VAZIO(), index: 0 }]);
- 
+
   const handleDoc = (id, campo, valor) =>
     setDocs(prev => prev.map(d => d.id === id ? { ...d, [campo]: valor } : d));
- 
+
   const adicionarDoc = () =>
     setDocs(prev => [...prev, { ...DOC_VAZIO(), index: prev.length }]);
- 
+
   const removerDoc = (id) =>
     setDocs(prev => prev.filter(d => d.id !== id).map((d, i) => ({ ...d, index: i })));
- 
+
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
- 
+
   return (
     <form onSubmit={handleSubmit} className="formulario-inscricao">
       <section>
@@ -635,7 +635,7 @@ function Etapa6({ avancar }) {
           <h3>Documentos</h3>
           <p>Anexe os documentos necessários para a sua inscrição.</p>
         </div>
- 
+
         <div className="lista-membros">
           {docs.map((doc) => (
             <CardDocumento
@@ -647,7 +647,7 @@ function Etapa6({ avancar }) {
             />
           ))}
         </div>
- 
+
         <button type="button" className="btn-adicionar-membro" onClick={adicionarDoc}>
           + Adicionar documento
         </button>
@@ -656,7 +656,7 @@ function Etapa6({ avancar }) {
     </form>
   );
 }
- 
+
 // ETAPA 7 – Termo de Compromisso
 function Etapa7({ avancar }) {
   const handleSubmit = (e) => { e.preventDefault(); avancar(); };
@@ -688,7 +688,7 @@ function Etapa7({ avancar }) {
     </form>
   );
 }
- 
+
 // TELA DE SUCESSO
 function TelaSucesso() {
   return (
@@ -699,12 +699,51 @@ function TelaSucesso() {
     </div>
   );
 }
- 
+
 // COMPONENTE RAIZ
 export default function Formulario() {
+  const enviarInscricao = async (dadosCompletos, arquivos) => {
+    const formData = new FormData();
+
+    // Adicionar todos os dados do formulário
+    Object.keys(dadosCompletos).forEach(key => {
+      if (key === 'membros') {
+        formData.append(key, JSON.stringify(dadosCompletos[key]));
+      } else if (key !== 'documentos') {
+        formData.append(key, dadosCompletos[key]);
+      }
+    });
+
+    // Adicionar arquivos
+    arquivos.forEach(arquivo => {
+      formData.append('documentos', arquivo);
+    });
+
+    try {
+      const response = await fetch('http://localhost:5000/api/inscricao', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('✅ Inscrição realizada com sucesso!');
+        return true;
+      } else {
+        alert(`❌ Erro: ${result.error}`);
+        return false;
+      }
+    } catch (error) {
+      console.error('Erro ao enviar:', error);
+      alert('❌ Erro ao conectar com o servidor');
+      return false;
+    }
+  };
+
   const [etapa, setEtapa] = useState(-1);
   const avancar = () => setEtapa((e) => e + 1);
- 
+
   const etapas = [
     <Etapa0 avancar={avancar} />,
     <Etapa1 avancar={avancar} />,
@@ -715,7 +754,7 @@ export default function Formulario() {
     <Etapa6 avancar={avancar} />,
     <Etapa7 avancar={avancar} />,
   ];
- 
+
   return (
     <div className="formulario-wrapper">
       <header className="cabecalho-principal">
@@ -725,7 +764,7 @@ export default function Formulario() {
           <p>Leia atentamente as diretrizes antes de prosseguir.</p>
         </div>
       </header>
- 
+
       {etapa === -1 && (
         <>
           <div className="conteudo-informativo">
@@ -755,7 +794,7 @@ export default function Formulario() {
           </div>
         </>
       )}
- 
+
       {etapa >= 0 && etapa < etapas.length && (
         <>
           <BarraProgresso etapa={etapa} />
@@ -764,7 +803,7 @@ export default function Formulario() {
           </div>
         </>
       )}
- 
+
       {etapa >= etapas.length && <TelaSucesso />}
     </div>
   );
