@@ -5,7 +5,7 @@ def conectar():
     try:
         conexao = mysql.connector.connect(
             host='localhost',
-            database='servidor_zentryx',
+            database='Sistema_zetryx',
             user='root',
             password=''
         )
