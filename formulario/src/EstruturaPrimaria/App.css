@@ -1,12 +1,12 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --text:           #94a3b8; /* Cinza levemente azulado para legibilidade */
-  --text-h:         #f0fdf4; /* Verde esmeralda extremamente claro */
-  --bg:             #060a07; /* Fundo quase preto com toque de verde escuro */
-  --border:         #142217; /* Bordas sutis */
-  --code-bg:        #0c140e; /* Fundo de blocos de código */
-  --accent:         #4ade80; /* Verde neon/pastel vibrante */
+  --text:           #94a3b8; 
+  --text-h:         #f0fdf4; 
+  --bg:             #060a07; 
+  --border:         #142217; 
+  --code-bg:        #0c140e;
+  --accent:         #4ade80; 
   --accent-bg:      rgba(74, 222, 128, 0.1);
   --accent-border:  rgba(74, 222, 128, 0.4);
   --shadow:         rgba(0,0,0,.5) 0 10px 15px -3px, rgba(0,0,0,.3) 0 4px 6px -2px;

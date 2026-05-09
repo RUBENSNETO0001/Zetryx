@@ -1,7 +1,4 @@
-cat > requirements.txt << 'EOF'
-Flask==2.3.3
-flask-cors==4.0.0
-mysql-connector-python==8.1.0
-python-dotenv==1.0.0
-Werkzeug==2.3.7
-EOF
+flask==3.0.3
+flask-cors==4.0.1
+mysql-connector-python==8.4.0
+werkzeug==3.0.3
