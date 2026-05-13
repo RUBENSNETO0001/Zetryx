@@ -230,7 +230,6 @@ def inscricao():
                     VALUES (%s, %s, %s)
                 """, (id_participante, filepath, arquivo.filename))
 
-        # COMMIT
         conn.commit()
         return jsonify({"success": True, "id_participante": id_participante}), 201
 
@@ -246,8 +245,6 @@ def inscricao():
         if conn:
             conn.close()
 
-
-# ROTA DE SAÚDE (para testar se o servidor está no ar)
 @app.route("/api/health", methods=["GET"])
 def health():
     try:
@@ -258,7 +255,6 @@ def health():
         return jsonify({"status": "erro", "db": str(e)}), 500
 
 
-# ─── HELPERS INTERNOS 
 def _resolver_banco(cursor, codigo, nome_outro=None):
     
     if not codigo or codigo == "outro":
@@ -279,7 +275,6 @@ def _resolver_banco(cursor, codigo, nome_outro=None):
 
 
 def _mapear_qtd_disciplinas(valor):
-    """Converte o texto do radio button para número inteiro."""
     mapa = {
         "uma":       1,
         "duas":      2,
@@ -289,6 +284,5 @@ def _mapear_qtd_disciplinas(valor):
     }
     return mapa.get(valor, 1)
 
-# começar o servidor Flask
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
