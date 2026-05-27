@@ -19,7 +19,7 @@ DB_CONFIG = {
 }
 
 # PASTA PARA SALVAR OS DOCUMENTOS ENVIADOS
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "/home/ruren/Documentos/GitHub/uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_EXTENSIONS = {"pdf", "jpg", "jpeg", "png"}
 
