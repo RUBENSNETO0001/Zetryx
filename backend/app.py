@@ -1,45 +1,148 @@
-
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import mysql.connector
+import json
+import logging
 import os
 import uuid
+
+import magic
+from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.utils import secure_filename
-from datetime import datetime
+import mysql.connector
+
+load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)  # Permite o React (localhost:3000) falar com esta API
+
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+CORS(app, origins=ALLOWED_ORIGINS)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=[],
+    storage_uri="memory://",
+)
 
 DB_CONFIG = {
-    "host":     "localhost",
-    "user":     "root",         
-    "password": "",             
-    "database": "Sistema_zetryx",
+    "host":     os.getenv("DB_HOST", "localhost"),
+    "user":     os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "database": os.getenv("DB_NAME", "Sistema_zetryx"),
     "charset":  "utf8mb4",
 }
 
-# PASTA PARA SALVAR OS DOCUMENTOS ENVIADOS
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "/Documentos/GitHub/uploads")
+UPLOAD_FOLDER = os.getenv(
+    "UPLOAD_FOLDER",
+    os.path.join(os.path.expanduser("~"), "uploads"),
+)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-ALLOWED_EXTENSIONS = {"pdf", "jpg", "jpeg", "png"}
 
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+MAX_UPLOAD_SIZE_MB = int(os.getenv("MAX_UPLOAD_MB", "5"))
+app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_SIZE_MB * 1024 * 1024  # bloqueia uploads grandes
+
+# Extensão → MIME types aceitos (dupla verificação)
+ALLOWED_MIME_TYPES = {
+    "pdf":  "application/pdf",
+    "jpg":  "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png":  "image/png",
+}
+
+
+def allowed_file(filename: str) -> bool:
+    """Verifica extensão do arquivo."""
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_MIME_TYPES
+
+
+def allowed_content(file_stream, extension: str) -> bool:
+    """Verifica o conteúdo real do arquivo (magic bytes), não só a extensão."""
+    header = file_stream.read(2048)
+    file_stream.seek(0)  # rebobina pro save() funcionar normalmente
+    detected_mime = magic.from_buffer(header, mime=True)
+    expected_mime = ALLOWED_MIME_TYPES.get(extension)
+    return detected_mime == expected_mime
 
 def get_db():
     return mysql.connector.connect(**DB_CONFIG)
 
 
+def _str(value, max_len: int = 255) -> str | None:
+    """Sanitiza string: strip + trunca."""
+    if value is None:
+        return None
+    return str(value).strip()[:max_len]
+
+
+def _int_safe(value, default: int = 0) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _float_safe(value, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _bool_form(value: str | None) -> int:
+    return 1 if value == "sim" else 0
+
+
+def _resolver_banco(cursor, codigo, nome_outro=None):
+    if not codigo or codigo == "outro":
+        nome = _str(nome_outro) or "Outro banco"
+        cursor.execute(
+            "SELECT id_bancoOf FROM Banco_Oficiais WHERE nome_instituicao = %s", (nome,)
+        )
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        cursor.execute(
+            "INSERT INTO Banco_Oficiais (codigo_bacen, nome_instituicao) VALUES (%s, %s)",
+            ("000", nome),
+        )
+        return cursor.lastrowid
+
+    cursor.execute(
+        "SELECT id_bancoOf FROM Banco_Oficiais WHERE codigo_bacen = %s", (codigo,)
+    )
+    row = cursor.fetchone()
+    return row[0] if row else 1
+
+
+def _mapear_qtd_disciplinas(valor: str) -> int:
+    mapa = {"uma": 1, "duas": 2, "mais_duas": 3, "tcc": 0, "estagio": 0}
+    return mapa.get(valor, 1)
+
 @app.route("/api/inscricao", methods=["POST"])
+@limiter.limit("10 per minute")
 def inscricao():
     conn = None
     cursor = None
     try:
+        # ── Validação mínima dos campos obrigatórios 
+        required_fields = ["matricula", "nome", "cpf", "email"]
+        missing = [f for f in required_fields if not request.form.get(f)]
+        if missing:
+            return jsonify({"success": False, "error": f"Campos obrigatórios ausentes: {missing}"}), 400
+
         conn   = get_db()
         cursor = conn.cursor()
 
         # 1. PARTICIPANTE
-        modalidade = request.form.get("auxilio", "permanencia")  # permanencia | transporte | ambos
+        modalidade = _str(request.form.get("auxilio", "permanencia"))
 
         cursor.execute("""
             INSERT INTO Participante
@@ -47,18 +150,18 @@ def inscricao():
                email, telefone, estado_civil, modalidade_auxilio)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
-            request.form.get("matricula"),
-            request.form.get("nome"),
-            request.form.get("cpf", "").replace(".", "").replace("-", ""),
-            request.form.get("dataNascimento"),
-            request.form.get("email"),
-            request.form.get("telefone"),
-            request.form.get("estadoCivil"),
+            _str(request.form.get("matricula"), 20),
+            _str(request.form.get("nome"), 150),
+            _str(request.form.get("cpf", "").replace(".", "").replace("-", ""), 11),
+            request.form.get("dataNascimento") or None,
+            _str(request.form.get("email"), 150),
+            _str(request.form.get("telefone"), 20),
+            _str(request.form.get("estadoCivil"), 30),
             modalidade,
         ))
         id_participante = cursor.lastrowid
 
-        # 2. ENDEREÇO 
+        # 2. ENDEREÇO
         cursor.execute("""
             INSERT INTO Endereco_participante
               (id_participante, rua, numero, bairro, cidade,
@@ -66,16 +169,16 @@ def inscricao():
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             id_participante,
-            request.form.get("rua"),
-            request.form.get("numero"),
-            request.form.get("bairro"),
-            request.form.get("cidade"),
-            request.form.get("pontoReferencia"),
-            request.form.get("cep", "").replace("-", ""),
-            request.form.get("complemento"),
+            _str(request.form.get("rua")),
+            _str(request.form.get("numero"), 10),
+            _str(request.form.get("bairro")),
+            _str(request.form.get("cidade")),
+            _str(request.form.get("pontoReferencia")),
+            _str(request.form.get("cep", "").replace("-", ""), 8),
+            _str(request.form.get("complemento")),
         ))
 
-        # 3. PERFIL / DECLARAÇÃO (lei de cotas, PCD, quilombola…)
+        # 3. PERFIL / DECLARAÇÃO
         cursor.execute("""
             INSERT INTO perfil_declaracao
               (id_participante, lei_cotas, possui_deficiencia,
@@ -83,27 +186,23 @@ def inscricao():
             VALUES (%s, %s, %s, %s, %s)
         """, (
             id_participante,
-            1 if request.form.get("leiCotas") == "sim" else 0,
-            1 if request.form.get("pcd")      == "sim" else 0,
-            1 if request.form.get("origemTradicional") == "sim" else 0,
-            1 if request.form.get("estrangeiroRefugiado") == "sim" else 0,
+            _bool_form(request.form.get("leiCotas")),
+            _bool_form(request.form.get("pcd")),
+            _bool_form(request.form.get("origemTradicional")),
+            _bool_form(request.form.get("estrangeiroRefugiado")),
         ))
 
-        # 4. PERFIL REQUISITOS (escolaridade / renda per capita)
-        renda_bruta  = float(request.form.get("rendaBruta") or 0)
-        qtd_pessoas  = int(request.form.get("qtdPessoas")   or 1)
-        renda_pc     = round(renda_bruta / qtd_pessoas, 2) if qtd_pessoas else 0
+        # 4. PERFIL REQUISITOS
+        renda_bruta = _float_safe(request.form.get("rendaBruta"))
+        qtd_pessoas = max(1, _int_safe(request.form.get("qtdPessoas"), 1))  # mínimo 1
+        renda_pc    = round(renda_bruta / qtd_pessoas, 2)
 
         cursor.execute("""
             INSERT INTO Perfil_requisitos (id_participante, escolaridade, renda_per_capita)
             VALUES (%s, %s, %s)
-        """, (
-            id_participante,
-            request.form.get("tipoEscola"),
-            renda_pc,
-        ))
+        """, (id_participante, _str(request.form.get("tipoEscola"), 50), renda_pc))
 
-        # 5. DADOS SOCIOECONÔMICOS 
+        # 5. DADOS SOCIOECONÔMICOS
         cursor.execute("""
             INSERT INTO Dados_Socioeconomicos
               (id_participante, tipo_moradia, mora_em,
@@ -111,17 +210,16 @@ def inscricao():
             VALUES (%s, %s, %s, %s, %s)
         """, (
             id_participante,
-            request.form.get("tipoMoradia"),
-            request.form.get("zonaResidencia"),
+            _str(request.form.get("tipoMoradia"), 50),
+            _str(request.form.get("zonaResidencia"), 50),
             renda_bruta,
             qtd_pessoas,
         ))
         id_socio = cursor.lastrowid
 
         # 6. BENEFÍCIOS
-        # tipoBolsa pode vir como múltiplos valores separados por vírgula
-        tipos_bolsa = request.form.get("tipoBolsa", "")
-        recebe = 1 if request.form.get("recebeAuxilio") == "sim" else 0
+        tipos_bolsa = _str(request.form.get("tipoBolsa", ""))
+        recebe = _bool_form(request.form.get("recebeAuxilio"))
 
         cursor.execute("""
             INSERT INTO Participante_Beneficios
@@ -132,12 +230,12 @@ def inscricao():
             id_socio,
             recebe,
             tipos_bolsa if recebe else None,
-            1 if request.form.get("bolsaFamilia") == "sim" else 0,
-            1 if request.form.get("beneficioBpc") == "sim" else 0,
+            _bool_form(request.form.get("bolsaFamilia")),
+            _bool_form(request.form.get("beneficioBpc")),
         ))
 
         # 7. DADOS BANCÁRIOS
-        banco_codigo = request.form.get("nomeBanco")  # "001", "104", etc. ou "outro"
+        banco_codigo = request.form.get("nomeBanco")
         id_banco_of  = _resolver_banco(cursor, banco_codigo, request.form.get("bancoOutro"))
 
         cursor.execute("""
@@ -148,17 +246,17 @@ def inscricao():
         """, (
             id_participante,
             id_banco_of,
-            1 if request.form.get("possuiConta") == "sim" else 0,
-            request.form.get("tipoConta"),
-            request.form.get("variacaoPoupanca"),
-            request.form.get("numeroConta"),
-            request.form.get("numeroAgencia"),
+            _bool_form(request.form.get("possuiConta")),
+            _str(request.form.get("tipoConta"), 30),
+            _str(request.form.get("variacaoPoupanca"), 10),
+            _str(request.form.get("numeroConta"), 20),
+            _str(request.form.get("numeroAgencia"), 10),
         ))
 
         # 8. CURSO
-        nome_curso = request.form.get("cursoSuperior", "")
+        nome_curso = _str(request.form.get("cursoSuperior", ""))
         if nome_curso == "outro":
-            nome_curso = request.form.get("cursoSuperiorOutro", "Outro")
+            nome_curso = _str(request.form.get("cursoSuperiorOutro", "Outro"))
 
         cursor.execute("""
             INSERT INTO Curso (id_participante, nome_curso, tipo_curso)
@@ -166,7 +264,7 @@ def inscricao():
         """, (id_participante, nome_curso, "Superior"))
         id_curso = cursor.lastrowid
 
-        # 9. MATRÍCULA 
+        # 9. MATRÍCULA
         qtd_disciplinas = _mapear_qtd_disciplinas(request.form.get("qtdDisciplinas", ""))
 
         cursor.execute("""
@@ -176,9 +274,13 @@ def inscricao():
         """, (id_participante, id_curso, qtd_disciplinas))
 
         # 10. MEMBROS DA FAMÍLIA
-        import json
         membros_raw = request.form.get("membros", "[]")
-        membros     = json.loads(membros_raw)
+        try:
+            membros = json.loads(membros_raw)
+            if not isinstance(membros, list):
+                raise ValueError("membros deve ser uma lista")
+        except (json.JSONDecodeError, ValueError):
+            return jsonify({"success": False, "error": "Campo 'membros' inválido"}), 400
 
         for m in membros:
             cursor.execute("""
@@ -187,25 +289,22 @@ def inscricao():
                 VALUES (%s, %s, %s, %s)
             """, (
                 id_participante,
-                m.get("nome"),
-                m.get("parentesco"),
+                _str(m.get("nome"), 150),
+                _str(m.get("parentesco"), 50),
                 m.get("dataNascimento") or None,
             ))
             id_membro = cursor.lastrowid
 
-            # Profissional
             cursor.execute("""
                 INSERT INTO Membro_Profissional (id_membro, profissao, vinculo_empregaticio)
                 VALUES (%s, %s, %s)
-            """, (id_membro, m.get("profissao"), m.get("vinculo")))
+            """, (id_membro, _str(m.get("profissao")), _str(m.get("vinculo"), 50)))
 
-            # Renda
             cursor.execute("""
                 INSERT INTO Membro_Renda (id_membro, renda_mensal)
                 VALUES (%s, %s)
-            """, (id_membro, float(m.get("renda") or 0)))
+            """, (id_membro, _float_safe(m.get("renda"))))
 
-            # Saúde
             cursor.execute("""
                 INSERT INTO Membro_Saude (id_membro, possui_deficiencia, possui_doenca_cronica)
                 VALUES (%s, %s, %s)
@@ -215,20 +314,28 @@ def inscricao():
                 1 if m.get("possuiDoencaCronica") else 0,
             ))
 
-        # 11. DOCUMENTOS (PDF / imagens) 
+        # 11. DOCUMENTOS — dupla verificação: extensão + conteúdo real
         arquivos = request.files.getlist("documentos")
         for arquivo in arquivos:
-            if arquivo and allowed_file(arquivo.filename):
-                ext      = arquivo.filename.rsplit(".", 1)[1].lower()
-                filename = f"{id_participante}_{uuid.uuid4().hex}.{ext}"
-                filepath = os.path.join(UPLOAD_FOLDER, secure_filename(filename))
-                arquivo.save(filepath)
+            if not arquivo or not arquivo.filename:
+                continue
+            ext = arquivo.filename.rsplit(".", 1)[-1].lower() if "." in arquivo.filename else ""
+            if not allowed_file(arquivo.filename):
+                logger.warning("Upload recusado (extensão): %s", arquivo.filename)
+                continue
+            if not allowed_content(arquivo.stream, ext):
+                logger.warning("Upload recusado (conteúdo): %s", arquivo.filename)
+                continue
 
-                cursor.execute("""
-                    INSERT INTO Pdf_Participante
-                      (id_participante, url_imagemDocumento, titulo_do_pdf)
-                    VALUES (%s, %s, %s)
-                """, (id_participante, filepath, arquivo.filename))
+            filename = f"{id_participante}_{uuid.uuid4().hex}.{ext}"
+            filepath = os.path.join(UPLOAD_FOLDER, secure_filename(filename))
+            arquivo.save(filepath)
+
+            cursor.execute("""
+                INSERT INTO Pdf_Participante
+                  (id_participante, url_imagemDocumento, titulo_do_pdf)
+                VALUES (%s, %s, %s)
+            """, (id_participante, filepath, secure_filename(arquivo.filename)))
 
         conn.commit()
         return jsonify({"success": True, "id_participante": id_participante}), 201
@@ -236,14 +343,16 @@ def inscricao():
     except Exception as e:
         if conn:
             conn.rollback()
-        print(f"[ERRO] {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        logger.error("Erro na inscrição: %s", e, exc_info=True)
+        # Não expõe detalhes do erro pro cliente em produção
+        return jsonify({"success": False, "error": "Erro interno. Tente novamente."}), 500
 
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
+
 
 @app.route("/api/health", methods=["GET"])
 def health():
@@ -252,37 +361,10 @@ def health():
         conn.close()
         return jsonify({"status": "ok", "db": "conectado"}), 200
     except Exception as e:
-        return jsonify({"status": "erro", "db": str(e)}), 500
+        logger.error("Health check falhou: %s", e)
+        return jsonify({"status": "erro", "db": "falha na conexão"}), 500
 
-
-def _resolver_banco(cursor, codigo, nome_outro=None):
-    
-    if not codigo or codigo == "outro":
-        nome = nome_outro or "Outro banco"
-        cursor.execute("SELECT id_bancoOf FROM Banco_Oficiais WHERE nome_instituicao = %s", (nome,))
-        row = cursor.fetchone()
-        if row:
-            return row[0]
-        cursor.execute(
-            "INSERT INTO Banco_Oficiais (codigo_bacen, nome_instituicao) VALUES (%s, %s)",
-            ("000", nome),
-        )
-        return cursor.lastrowid
-
-    cursor.execute("SELECT id_bancoOf FROM Banco_Oficiais WHERE codigo_bacen = %s", (codigo,))
-    row = cursor.fetchone()
-    return row[0] if row else 1 
-
-
-def _mapear_qtd_disciplinas(valor):
-    mapa = {
-        "uma":       1,
-        "duas":      2,
-        "mais_duas": 3,
-        "tcc":       0,
-        "estagio":   0,
-    }
-    return mapa.get(valor, 1)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    debug_mode = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+    app.run(debug=debug_mode, port=int(os.getenv("PORT", 5000)))

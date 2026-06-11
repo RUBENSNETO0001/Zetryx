@@ -2,3 +2,6 @@ flask==3.0.3
 flask-cors==4.0.1
 mysql-connector-python==8.4.0
 werkzeug==3.0.3
+python-dotenv
+flask-limiter
+python-magic
