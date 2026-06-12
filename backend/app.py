@@ -47,9 +47,8 @@ UPLOAD_FOLDER = os.getenv(
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 MAX_UPLOAD_SIZE_MB = int(os.getenv("MAX_UPLOAD_MB", "5"))
-app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_SIZE_MB * 1024 * 1024  # bloqueia uploads grandes
+app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_SIZE_MB * 1024 * 1024  
 
-# Extensão → MIME types aceitos (dupla verificação)
 ALLOWED_MIME_TYPES = {
     "pdf":  "application/pdf",
     "jpg":  "image/jpeg",
@@ -64,9 +63,8 @@ def allowed_file(filename: str) -> bool:
 
 
 def allowed_content(file_stream, extension: str) -> bool:
-    """Verifica o conteúdo real do arquivo (magic bytes), não só a extensão."""
     header = file_stream.read(2048)
-    file_stream.seek(0)  # rebobina pro save() funcionar normalmente
+    file_stream.seek(0)  
     detected_mime = magic.from_buffer(header, mime=True)
     expected_mime = ALLOWED_MIME_TYPES.get(extension)
     return detected_mime == expected_mime
@@ -76,7 +74,6 @@ def get_db():
 
 
 def _str(value, max_len: int = 255) -> str | None:
-    """Sanitiza string: strip + trunca."""
     if value is None:
         return None
     return str(value).strip()[:max_len]
@@ -344,7 +341,6 @@ def inscricao():
         if conn:
             conn.rollback()
         logger.error("Erro na inscrição: %s", e, exc_info=True)
-        # Não expõe detalhes do erro pro cliente em produção
         return jsonify({"success": False, "error": "Erro interno. Tente novamente."}), 500
 
     finally:
