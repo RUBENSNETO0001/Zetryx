@@ -109,12 +109,12 @@ function Etapa1({ avancar }) {
         <h3>Dados Pessoais</h3>
         <div className="campo-formulario">
           <label htmlFor="matricula">Matrícula Ifac *</label>
-          <input type="text" id="matricula" name="matricula" placeholder="Ex: 20240001" required />
+          <input type="text" id="matricula" name="matricula" placeholder="Ex: Codigo da sua matricula" required />
           <span className="campo-dica">Sua matrícula institucional no Ifac</span>
         </div>
         <div className="campo-formulario">
           <label htmlFor="nome">Nome Completo *</label>
-          <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required />
+          <input type="text" id="nome" name="nome" placeholder="Insira seu nome completo" required />
         </div>
         <div className="campo-formulario">
           <label htmlFor="cpf">CPF *</label>
@@ -309,11 +309,11 @@ function Etapa3({ avancar }) {
         </div>
         <div className="campo-formulario">
           <label>Número da Agência</label>
-          <input type="text" name="numeroAgencia" className="input-texto-linha" />
+          <input type="text" name="numeroAgencia" className="input-texto-linha" placeholder="Ex: 111"/>
         </div>
         <div className="campo-formulario">
           <label>Número da Conta <span className="campo-dica-inline">(para Poupança BB, informar como está no contrato)</span></label>
-          <input type="text" name="numeroConta" className="input-texto-linha" />
+          <input type="text" name="numeroConta" className="input-texto-linha" placeholder="Ex: 12345-6" />
         </div>
       </section>
       <button type="submit" className="btn-enviar">Próxima etapa →</button>
@@ -597,11 +597,12 @@ function Etapa5({ avancar }) {
   };
 
   const cursos = [
-    ['ads', 'Análise e Desenvolvimento de Sistemas'],
-    ['enfermagem', 'Enfermagem'],
-    ['agronomia', 'Agronomia'],
-    ['gestao_publica', 'Gestão Pública'],
-    ['letras', 'Letras – Língua Portuguesa'],
+    ['biologia', 'Biologia'],
+    ['administração', 'Administração'],
+    ['matematica', 'Matemática'],
+    ['spi', 'Sistemas para Internet'],
+    ['pe', 'Processos escolares'],
+    ['logistica', 'Logística'],
     ['outro', 'Outro'],
   ];
 
@@ -718,6 +719,7 @@ function Etapa6({ avancar, setArquivosGlobal }) {
         <div className="cabecalho-verde">
           <h3>Documentos</h3>
           <p>Anexe os documentos necessários para a sua inscrição.</p>
+          <a href="https://sei.ifac.edu.br/sei/publicacoes/controlador_publicacoes.php?acao=publicacao_visualizar&id_documento=1378286&id_orgao_publicacao=0" target="_blank" rel="noopener noreferrer" style={{ marginBottom: 24, color: 'var(--texto-leve)', fontSize: '.9rem' }}>Ver o edital</a>
         </div>
         <div className="lista-membros">
           {docs.map((doc) => (
@@ -870,6 +872,7 @@ export default function Formulario() {
           </div>
           <div className="container-formulario">
             <div className="formulario-inscricao" style={{ textAlign: 'center', paddingTop: 40, paddingBottom: 40 }}>
+              <a href="https://sei.ifac.edu.br/sei/publicacoes/controlador_publicacoes.php?acao=publicacao_visualizar&id_documento=1378286&id_orgao_publicacao=0" target="_blank" rel="noopener noreferrer" style={{ marginBottom: 24, color: 'var(--texto-leve)', fontSize: '.9rem' }}>Ver o edital</a>
               <p style={{ marginBottom: 24, color: 'var(--texto-leve)', fontSize: '.9rem' }}>
                 Clique no botão abaixo para iniciar o formulário de inscrição.
               </p>
