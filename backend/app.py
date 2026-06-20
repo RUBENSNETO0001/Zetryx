@@ -337,6 +337,14 @@ def inscricao():
         conn.commit()
         return jsonify({"success": True, "id_participante": id_participante}), 201
 
+    except mysql.connector.IntegrityError as e:
+        if conn:
+            conn.rollback()
+        if e.errno == 1062:
+            return jsonify({"success": False, "error": "Matrícula já cadastrada."}), 409
+        logger.error("Erro de integridade: %s", e, exc_info=True)
+        return jsonify({"success": False, "error": "Erro de integridade nos dados."}), 400
+
     except Exception as e:
         if conn:
             conn.rollback()

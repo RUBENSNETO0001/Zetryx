@@ -735,7 +735,7 @@ function Etapa6({ avancar, setArquivosGlobal }) {
   );
 }
 
-function Etapa7({ avancar, enviando }) {
+function Etapa7({ avancar, enviando, erro }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     avancar({ aceiteTermo: true });
@@ -764,6 +764,11 @@ function Etapa7({ avancar, enviando }) {
             Li e concordo com os termos acima mencionados. *
           </label>
         </div>
+        {erro && (
+          <div className="aviso-legal" style={{ borderColor: '#f87171', background: 'rgba(248,113,113,.08)' }}>
+            <p style={{ color: '#f87171' }}>{erro}</p>
+          </div>
+        )}
       </section>
       <button type="submit" className="btn-enviar" disabled={enviando}>
         {enviando ? '⏳ Enviando…' : 'Concluir inscrição ✓'}
@@ -789,6 +794,7 @@ export default function Formulario() {
   const [membros, setMembros] = useState([]);
   const [arquivos, setArquivos] = useState([]);
   const [enviando, setEnviando] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState(null);
 
   const avancar = (novosDados = {}) => {
     setDadosCompletos(prev => ({ ...prev, ...novosDados }));
@@ -797,6 +803,7 @@ export default function Formulario() {
 
   const enviarInscricao = async (dadosTermo) => {
     setEnviando(true);
+    setErroEnvio(null);
     const tudo = { ...dadosCompletos, ...dadosTermo };
 
     const formData = new FormData();
@@ -818,15 +825,23 @@ export default function Formulario() {
         method: 'POST',
         body: formData,
       });
-      const result = await res.json();
-      if (result.success) {
+
+      let result = null;
+      try {
+        result = await res.json();
+      } catch {
+        // Resposta não veio como JSON (ex: erro 500 sem corpo JSON)
+        result = null;
+      }
+
+      if (res.ok && result?.success) {
         setEtapa(8); // tela de sucesso
       } else {
-        alert(`❌ Erro: ${result.error}`);
+        setErroEnvio(result?.error || 'Não foi possível concluir a inscrição. Tente novamente.');
       }
     } catch (err) {
       console.error(err);
-      alert('❌ Não foi possível conectar ao servidor.\nVerifique se o backend Python está rodando na porta 5000.');
+      setErroEnvio('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -840,7 +855,7 @@ export default function Formulario() {
     <Etapa4 avancar={avancar} setMembrosGlobal={setMembros} />,
     <Etapa5 avancar={avancar} />,
     <Etapa6 avancar={avancar} setArquivosGlobal={setArquivos} />,
-    <Etapa7 avancar={enviarInscricao} enviando={enviando} />,
+    <Etapa7 avancar={enviarInscricao} enviando={enviando} erro={erroEnvio} />,
   ];
 
   return (
