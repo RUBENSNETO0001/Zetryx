@@ -167,17 +167,18 @@ def _mapear_qtd_disciplinas(valor: str) -> int:
 def home():
     return {"status": "ok", "message": "API Zetryx rodando no Railway!"}, 200
 
-@app.route('/api/inscricao', methods=['GET', 'OPTIONS'])
-@limiter.limit("10 per minute")
+@app.route('/api/inscricao', methods=['GET', 'POST', 'OPTIONS'])
 def inscricao():
-    # Se for acesso direto no navegador
-    if request.method == 'GET':
-        return jsonify({"message": "Endpoint de inscrição ativo. Envie os dados via POST."}), 200
-
-    # Trata preflight do CORS
+    # Trata o preflight CORS explicitamente
     if request.method == 'OPTIONS':
-        return jsonify({"status": "ok"}), 200
+        response = jsonify({"status": "ok"})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+        response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        return response, 200
 
+    if request.method == 'GET':
+        return jsonify({"message": "Endpoint de inscrição ativo."}), 200
     # Processamento do formulário (POST)
     conn = None
     cursor = None
@@ -199,7 +200,7 @@ def inscricao():
                email, telefone, estado_civil, modalidade_auxilio)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
-            _str(request.form.get("matricula"), 20),
+            _str(request.form("matricula"), 20),
             _str(request.form.get("nome"), 150),
             _str(request.form.get("cpf", "").replace(".", "").replace("-", ""), 11),
             request.form.get("dataNascimento") or None,
