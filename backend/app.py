@@ -2,8 +2,8 @@ import json
 import logging
 import os
 import uuid
-import puremagic as magic
 import urllib.parse
+import puremagic as magic
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -14,9 +14,7 @@ import mysql.connector
 
 load_dotenv()
 
-app = Flask(__name__)
-
-
+# Configuração de Logs
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -25,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 limiter = Limiter(
@@ -34,6 +32,8 @@ limiter = Limiter(
     default_limits=[],
     storage_uri="memory://",
 )
+
+# ── TRATAMENTO E CONEXÃO AO BANCO DE DADOS ────────────────────────────────────
 
 def _get_db_port():
     port_val = os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306")
@@ -52,6 +52,7 @@ def _split_host_port(host_str, fallback_port):
         except ValueError:
             return host_str, fallback_port
     return host_str, fallback_port
+
 
 # Suporte automático para MYSQL_URL do Railway
 mysql_url = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
@@ -79,7 +80,13 @@ else:
         "charset": "utf8mb4",
     }
 
-logger.info("DB_CONFIG resolvido -> host=%s port=%s database=%s", DB_CONFIG["host"], DB_CONFIG["port"], DB_CONFIG["database"])
+logger.info(
+    "DB_CONFIG resolvido -> host=%s port=%s database=%s",
+    DB_CONFIG["host"], DB_CONFIG["port"], DB_CONFIG["database"]
+)
+
+# ── UPLOAD DE ARQUIVOS ────────────────────────────────────────────────────────
+
 UPLOAD_FOLDER = os.getenv(
     "UPLOAD_FOLDER",
     os.path.join(os.path.expanduser("~"), "uploads"),
@@ -109,14 +116,25 @@ def allowed_content(file_stream, extension: str) -> bool:
     expected_mime = ALLOWED_MIME_TYPES.get(extension)
     return detected_mime == expected_mime
 
+
 def get_db():
     return mysql.connector.connect(**DB_CONFIG)
 
 
+# ── AUXILIARES DE TRATAMENTO DE DADOS ─────────────────────────────────────────
+
 def _str(value, max_len: int = 255) -> str | None:
     if value is None:
         return None
-    return str(value).strip()[:max_len]
+    val = str(value).strip()
+    return val[:max_len] if val else None
+
+
+def _date_safe(value):
+    """Garante que strings vazias de datas sejam tratadas como None (NULL)."""
+    if not value or not str(value).strip():
+        return None
+    return str(value).strip()
 
 
 def _int_safe(value, default: int = 0) -> int:
@@ -163,9 +181,13 @@ def _mapear_qtd_disciplinas(valor: str) -> int:
     mapa = {"uma": 1, "duas": 2, "mais_duas": 3, "tcc": 0, "estagio": 0}
     return mapa.get(valor, 1)
 
+
+# ── ROTAS DA API ──────────────────────────────────────────────────────────────
+
 @app.route('/')
 def home():
-    return {"status": "ok", "message": "API Zetryx rodando no Railway!"}, 200
+    return jsonify({"status": "ok", "message": "API Zetryx rodando no Railway!"}), 200
+
 
 @app.route('/api/inscricao', methods=['GET', 'POST', 'OPTIONS'])
 def inscricao():
@@ -178,17 +200,19 @@ def inscricao():
         return response, 200
 
     if request.method == 'GET':
-        return jsonify({"message": "Endpoint de inscrição ativo."}), 200
+        return jsonify({"message": "Endpoint de inscrição ativo. Envie os dados via POST."}), 200
+
     # Processamento do formulário (POST)
     conn = None
     cursor = None
     try:
-        # ── Validação mínima dos campos obrigatórios 
+        # Validação mínima dos campos obrigatórios
         required_fields = ["matricula", "nome", "cpf", "email"]
         missing = [f for f in required_fields if not request.form.get(f)]
         if missing:
             return jsonify({"success": False, "error": f"Campos obrigatórios ausentes: {missing}"}), 400
-        conn   = get_db()
+
+        conn = get_db()
         cursor = conn.cursor()
 
         # 1. PARTICIPANTE
@@ -203,7 +227,7 @@ def inscricao():
             _str(request.form.get("matricula"), 20),
             _str(request.form.get("nome"), 150),
             _str(request.form.get("cpf", "").replace(".", "").replace("-", ""), 11),
-            request.form.get("dataNascimento") or None,
+            _date_safe(request.form.get("dataNascimento")),
             _str(request.form.get("email"), 150),
             _str(request.form.get("telefone"), 20),
             _str(request.form.get("estadoCivil"), 30),
@@ -244,7 +268,7 @@ def inscricao():
 
         # 4. PERFIL REQUISITOS
         renda_bruta = _float_safe(request.form.get("rendaBruta"))
-        qtd_pessoas = max(1, _int_safe(request.form.get("qtdPessoas"), 1))  # mínimo 1
+        qtd_pessoas = max(1, _int_safe(request.form.get("qtdPessoas"), 1))
         renda_pc    = round(renda_bruta / qtd_pessoas, 2)
 
         cursor.execute("""
@@ -341,7 +365,7 @@ def inscricao():
                 id_participante,
                 _str(m.get("nome"), 150),
                 _str(m.get("parentesco"), 50),
-                m.get("dataNascimento") or None,
+                _date_safe(m.get("dataNascimento")),
             ))
             id_membro = cursor.lastrowid
 
@@ -364,7 +388,7 @@ def inscricao():
                 1 if m.get("possuiDoencaCronica") else 0,
             ))
 
-        # 11. DOCUMENTOS — dupla verificação: extensão + conteúdo real
+        # 11. DOCUMENTOS — verificação e salvamento
         arquivos = request.files.getlist("documentos")
         for arquivo in arquivos:
             if not arquivo or not arquivo.filename:
@@ -396,14 +420,14 @@ def inscricao():
         if e.errno == 1062:
             return jsonify({"success": False, "error": "Matrícula já cadastrada."}), 409
         logger.error("Erro de integridade: %s", e, exc_info=True)
-        return jsonify({"success": False, "error": "Erro de integridade nos dados."}), 400
+        return jsonify({"success": False, "error": f"Erro de integridade nos dados: {e}"}), 400
 
     except Exception as e:
         if conn:
             conn.rollback()
         logger.error("Erro na inscrição: %s", e, exc_info=True)
-        # Retorna o erro exato do MySQL/Python para o frontend
         return jsonify({"success": False, "error": str(e)}), 500
+
     finally:
         if cursor:
             cursor.close()
@@ -419,7 +443,7 @@ def health():
         return jsonify({"status": "ok", "db": "conectado"}), 200
     except Exception as e:
         logger.error("Health check falhou: %s", e)
-        return jsonify({"status": "erro", "db": "falha na conexão"}), 500
+        return jsonify({"status": "erro", "db": f"falha na conexão: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
