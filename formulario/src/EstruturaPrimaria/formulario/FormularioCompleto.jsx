@@ -309,7 +309,7 @@ function Etapa3({ avancar }) {
         </div>
         <div className="campo-formulario">
           <label>Número da Agência</label>
-          <input type="text" name="numeroAgencia" className="input-texto-linha" placeholder="Ex: 111"/>
+          <input type="text" name="numeroAgencia" className="input-texto-linha" placeholder="Ex: 111" />
         </div>
         <div className="campo-formulario">
           <label>Número da Conta <span className="campo-dica-inline">(para Poupança BB, informar como está no contrato)</span></label>
@@ -821,7 +821,7 @@ export default function Formulario() {
     arquivos.forEach(arq => formData.append('documentos', arq));
 
     try {
-      const res = await fetch('http://localhost:5000/api/inscricao', {
+      const res = await fetch('https://zetryx-production.up.railway.app/api/inscricao', {
         method: 'POST',
         body: formData,
       });
