@@ -12,9 +12,9 @@ MarkupSafe==3.0.3
 mysql-connector-python==8.4.0
 ordered-set==4.1.0
 packaging==26.2
+puremagic==2.2.0
 PyMySQL==1.2.0
 python-dotenv==1.2.2
-python-magic==0.4.27
 typing_extensions==4.15.0
 Werkzeug==3.0.3
 wrapt==2.2.1
