@@ -820,30 +820,28 @@ export default function Formulario() {
     // Arquivos binários
     arquivos.forEach(arq => formData.append('documentos', arq));
 
-    try { 
-      const res = await fetch('https://zetryx-production.up.railway.app/api/inscricao', {
-        method: 'POST',
-        body: formData,
+    try {
+      let e = await fetch(`https://zetryx-production.up.railway.app/api/inscricao`, {
+        method: `POST`,
+        body: a
       });
 
-      let result = null;
-      try {
-        result = await res.json();
-      } catch {
-        // Resposta não veio como JSON (ex: erro 500 sem corpo JSON)
-        result = null;
+      let resultado = await e.json();
+
+      if (!e.ok) {
+        // Exibe a mensagem de erro que vem do backend (ex: erro no MySQL, campo ausente, etc.)
+        console.error("Erro na inscrição:", resultado.error);
+        alert(`Falha no envio: ${resultado.error || 'Erro desconhecido'}`);
+        return;
       }
 
-      if (res.ok && result?.success) {
-        setEtapa(8); // tela de sucesso
-      } else {
-        setErroEnvio(result?.error || 'Não foi possível concluir a inscrição. Tente novamente.');
-      }
+      // Sucesso na gravação
+      console.log("Inscrição realizada com sucesso!", resultado);
+      alert("Inscrição realizada com sucesso!");
+
     } catch (err) {
-      console.error(err);
-      setErroEnvio('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
-    } finally {
-      setEnviando(false);
+      console.error("Erro na requisição:", err);
+      alert("Não foi possível conectar ao servidor. Verifique sua conexão e.");
     }
   };
 
