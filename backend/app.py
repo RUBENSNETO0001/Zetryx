@@ -155,14 +155,15 @@ def home():
 @app.route('/api/inscricao', methods=['GET', 'POST', 'OPTIONS'])
 @limiter.limit("10 per minute")
 def inscricao():
-    # Se alguém acessar direto pelo navegador via GET
+    # Se for acesso direto no navegador
     if request.method == 'GET':
         return jsonify({"message": "Endpoint de inscrição ativo. Envie os dados via POST."}), 200
 
-    # Trata requisições de preflight do CORS
+    # Trata preflight do CORS
     if request.method == 'OPTIONS':
         return jsonify({"status": "ok"}), 200
 
+    # Processamento do formulário (POST)
     conn = None
     cursor = None
     try:
