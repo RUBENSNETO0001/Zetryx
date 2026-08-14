@@ -14,6 +14,9 @@ import mysql.connector
 
 load_dotenv()
 
+app = Flask(__name__)
+
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -23,7 +26,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-CORS(app, origins=ALLOWED_ORIGINS)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 limiter = Limiter(
     get_remote_address,
@@ -128,7 +131,7 @@ def _mapear_qtd_disciplinas(valor: str) -> int:
 def home():
     return {"status": "ok", "message": "API Zetryx rodando no Railway!"}, 200
 
-@app.route("/api/inscricao", methods=["POST"])
+@app.route('/api/inscricao', methods=['POST', 'OPTIONS'])
 @limiter.limit("10 per minute")
 def inscricao():
     conn = None
