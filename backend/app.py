@@ -152,9 +152,17 @@ def _mapear_qtd_disciplinas(valor: str) -> int:
 def home():
     return {"status": "ok", "message": "API Zetryx rodando no Railway!"}, 200
 
-@app.route('/api/inscricao', methods=['POST', 'OPTIONS'])
+@app.route('/api/inscricao', methods=['GET', 'POST', 'OPTIONS'])
 @limiter.limit("10 per minute")
 def inscricao():
+    # Se alguém acessar direto pelo navegador via GET
+    if request.method == 'GET':
+        return jsonify({"message": "Endpoint de inscrição ativo. Envie os dados via POST."}), 200
+
+    # Trata requisições de preflight do CORS
+    if request.method == 'OPTIONS':
+        return jsonify({"status": "ok"}), 200
+
     conn = None
     cursor = None
     try:
@@ -163,7 +171,6 @@ def inscricao():
         missing = [f for f in required_fields if not request.form.get(f)]
         if missing:
             return jsonify({"success": False, "error": f"Campos obrigatórios ausentes: {missing}"}), 400
-
         conn   = get_db()
         cursor = conn.cursor()
 
