@@ -33,10 +33,11 @@ limiter = Limiter(
 )
 
 DB_CONFIG = {
-    "host":     os.getenv("DB_HOST", "localhost"),
-    "user":     os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "database": os.getenv("DB_NAME", "Sistema_zetryx"),
+    "host":     os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost"),
+    "port":     int(os.getenv("MYSQLPORT", 3306)),
+    "user":     os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
+    "password": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
+    "database": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway"),
     "charset":  "utf8mb4",
 }
 
@@ -369,6 +370,7 @@ def health():
         return jsonify({"status": "erro", "db": "falha na conexão"}), 500
 
 
-if __name__ == "__main__":
-    debug_mode = os.getenv("FLASK_DEBUG", "false").lower() == "true"
-    app.run(debug=debug_mode, port=int(os.getenv("PORT", 5000)))
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
+    app.run(host='0.0.0.0', port=port, debug=debug)
