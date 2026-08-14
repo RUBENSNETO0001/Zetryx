@@ -124,6 +124,10 @@ def _mapear_qtd_disciplinas(valor: str) -> int:
     mapa = {"uma": 1, "duas": 2, "mais_duas": 3, "tcc": 0, "estagio": 0}
     return mapa.get(valor, 1)
 
+@app.route('/')
+def home():
+    return {"status": "ok", "message": "API Zetryx rodando no Railway!"}, 200
+
 @app.route("/api/inscricao", methods=["POST"])
 @limiter.limit("10 per minute")
 def inscricao():
