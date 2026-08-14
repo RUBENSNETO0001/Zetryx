@@ -3,7 +3,7 @@ import logging
 import os
 import uuid
 import puremagic as magic
- 
+import urllib.parse
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -35,21 +35,36 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-port_env = os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306")
-try:
-    db_port = int(port_env)
-except ValueError:
-    db_port = 3306
+# Tratamento seguro da porta
+def _get_db_port():
+    port_val = os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306")
+    try:
+        return int(port_val)
+    except (TypeError, ValueError):
+        return 3306
 
-DB_CONFIG = {
-    "host":     os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost"),
-    "port":     db_port,
-    "user":     os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
-    "password": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway"),
-    "charset":  "utf8mb4",
-}
+# Suporte automático para MYSQL_URL do Railway
+mysql_url = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
 
+if mysql_url:
+    url = urllib.parse.urlparse(mysql_url)
+    DB_CONFIG = {
+        "host": url.hostname,
+        "port": url.port or 3306,
+        "user": url.username,
+        "password": url.password,
+        "database": url.path.lstrip("/"),
+        "charset": "utf8mb4",
+    }
+else:
+    DB_CONFIG = {
+        "host": os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost"),
+        "port": _get_db_port(),
+        "user": os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
+        "password": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
+        "database": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway"),
+        "charset": "utf8mb4",
+    }
 UPLOAD_FOLDER = os.getenv(
     "UPLOAD_FOLDER",
     os.path.join(os.path.expanduser("~"), "uploads"),
