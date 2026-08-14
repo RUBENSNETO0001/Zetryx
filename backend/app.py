@@ -200,7 +200,7 @@ def inscricao():
                email, telefone, estado_civil, modalidade_auxilio)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
-            _str(request.form("matricula"), 20),
+            _str(request.form.get("matricula"), 20),
             _str(request.form.get("nome"), 150),
             _str(request.form.get("cpf", "").replace(".", "").replace("-", ""), 11),
             request.form.get("dataNascimento") or None,
