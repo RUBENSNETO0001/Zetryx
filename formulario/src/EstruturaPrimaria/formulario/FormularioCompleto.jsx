@@ -820,7 +820,7 @@ export default function Formulario() {
     // Arquivos binários
     arquivos.forEach(arq => formData.append('documentos', arq));
 
-    try {
+    try { 
       const res = await fetch('https://zetryx-production.up.railway.app/api/inscricao', {
         method: 'POST',
         body: formData,
