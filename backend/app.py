@@ -35,7 +35,6 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-# Tratamento seguro da porta
 def _get_db_port():
     port_val = os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306")
     try:
@@ -43,28 +42,44 @@ def _get_db_port():
     except (TypeError, ValueError):
         return 3306
 
+
+def _split_host_port(host_str, fallback_port):
+    """Blinda contra host vindo como 'host:porta' junto (causa do erro 2003)."""
+    if host_str and ":" in host_str:
+        h, _, p = host_str.rpartition(":")
+        try:
+            return h, int(p)
+        except ValueError:
+            return host_str, fallback_port
+    return host_str, fallback_port
+
 # Suporte automático para MYSQL_URL do Railway
 mysql_url = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
 
 if mysql_url:
     url = urllib.parse.urlparse(mysql_url)
+    host, port = _split_host_port(url.hostname, url.port or 3306)
     DB_CONFIG = {
-        "host": url.hostname,
-        "port": url.port or 3306,
+        "host": host,
+        "port": port,
         "user": url.username,
         "password": url.password,
         "database": url.path.lstrip("/"),
         "charset": "utf8mb4",
     }
 else:
+    raw_host = os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost")
+    host, port = _split_host_port(raw_host, _get_db_port())
     DB_CONFIG = {
-        "host": os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost"),
-        "port": _get_db_port(),
+        "host": host,
+        "port": port,
         "user": os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
         "password": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
         "database": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway"),
         "charset": "utf8mb4",
     }
+
+logger.info("DB_CONFIG resolvido -> host=%s port=%s database=%s", DB_CONFIG["host"], DB_CONFIG["port"], DB_CONFIG["database"])
 UPLOAD_FOLDER = os.getenv(
     "UPLOAD_FOLDER",
     os.path.join(os.path.expanduser("~"), "uploads"),
