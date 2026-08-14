@@ -402,8 +402,8 @@ def inscricao():
         if conn:
             conn.rollback()
         logger.error("Erro na inscrição: %s", e, exc_info=True)
-        return jsonify({"success": False, "error": str(e)}), 500  # TEMPORÁRIO: reverter para "Erro interno. Tente novamente." depois de debugar
-
+        # Retorna o erro exato do MySQL/Python para o frontend
+        return jsonify({"success": False, "error": str(e)}), 500
     finally:
         if cursor:
             cursor.close()
