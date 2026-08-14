@@ -35,9 +35,15 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
+port_env = os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306")
+try:
+    db_port = int(port_env)
+except ValueError:
+    db_port = 3306
+
 DB_CONFIG = {
     "host":     os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost"),
-    "port":     int(os.getenv("MYSQLPORT", 3306)),
+    "port":     db_port,
     "user":     os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
     "password": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway"),
