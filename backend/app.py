@@ -357,7 +357,7 @@ def inscricao():
         if conn:
             conn.rollback()
         logger.error("Erro na inscrição: %s", e, exc_info=True)
-        return jsonify({"success": False, "error": "Erro interno. Tente novamente."}), 500
+        return jsonify({"success": False, "error": str(e)}), 500  # TEMPORÁRIO: reverter para "Erro interno. Tente novamente." depois de debugar
 
     finally:
         if cursor:
