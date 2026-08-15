@@ -55,22 +55,22 @@ def _split_host_port(host_str, fallback_port):
 
 
 # Suporte automático para MYSQL_URL do Railway
-mysql_url = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
+raw_host = os.getenv("DB_HOST") or os.getenv("MYSQLHOST")
 
-if mysql_url:
+if not raw_host and (os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")):
+    mysql_url = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
     url = urllib.parse.urlparse(mysql_url)
     host, port = _split_host_port(url.hostname, url.port or 3306)
     user = url.username
     password = url.password
     database = url.path.lstrip("/") if url.path else "railway"
 else:
-    raw_host = os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost")
+    raw_host = raw_host or "localhost"
     host, port = _split_host_port(raw_host, _get_db_port())
-    user = os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root")
-    password = os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", "")
-    database = os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway")
+    user = os.getenv("DB_USER") or os.getenv("MYSQLUSER", "root")
+    password = os.getenv("DB_PASSWORD") or os.getenv("MYSQLPASSWORD", "")
+    database = os.getenv("DB_NAME") or os.getenv("MYSQLDATABASE", "railway")
 
-# Garantia absoluta de tipos para evitar o crash %u do mysql.connector
 DB_CONFIG = {
     "host": str(host) if host else "localhost",
     "port": int(port) if port else 3306,
