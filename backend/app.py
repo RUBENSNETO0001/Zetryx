@@ -45,13 +45,13 @@ def _get_db_port():
 
 def _split_host_port(host_str, fallback_port):
     """Blinda contra host vindo como 'host:porta' junto (causa do erro 2003)."""
-    if host_str and ":" in host_str:
-        h, _, p = host_str.rpartition(":")
+    if host_str and ":" in str(host_str):
+        h, _, p = str(host_str).rpartition(":")
         try:
             return h, int(p)
         except ValueError:
-            return host_str, fallback_port
-    return host_str, fallback_port
+            return host_str, int(fallback_port)
+    return host_str, int(fallback_port)
 
 
 # Suporte automático para MYSQL_URL do Railway
@@ -60,25 +60,25 @@ mysql_url = os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")
 if mysql_url:
     url = urllib.parse.urlparse(mysql_url)
     host, port = _split_host_port(url.hostname, url.port or 3306)
-    DB_CONFIG = {
-        "host": host,
-        "port": port,
-        "user": url.username,
-        "password": url.password,
-        "database": url.path.lstrip("/"),
-        "charset": "utf8mb4",
-    }
+    user = url.username
+    password = url.password
+    database = url.path.lstrip("/") if url.path else "railway"
 else:
     raw_host = os.getenv("MYSQLHOST") or os.getenv("DB_HOST", "localhost")
     host, port = _split_host_port(raw_host, _get_db_port())
-    DB_CONFIG = {
-        "host": host,
-        "port": port,
-        "user": os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root"),
-        "password": os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", ""),
-        "database": os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway"),
-        "charset": "utf8mb4",
-    }
+    user = os.getenv("MYSQLUSER") or os.getenv("DB_USER", "root")
+    password = os.getenv("MYSQLPASSWORD") or os.getenv("DB_PASSWORD", "")
+    database = os.getenv("MYSQLDATABASE") or os.getenv("DB_NAME", "railway")
+
+# Garantia absoluta de tipos para evitar o crash %u do mysql.connector
+DB_CONFIG = {
+    "host": str(host) if host else "localhost",
+    "port": int(port) if port else 3306,
+    "user": str(user) if user else "root",
+    "password": str(password) if password else "",
+    "database": str(database) if database else "railway",
+    "charset": "utf8mb4",
+}
 
 logger.info(
     "DB_CONFIG resolvido -> host=%s port=%s database=%s",
