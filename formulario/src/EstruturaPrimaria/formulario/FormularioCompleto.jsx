@@ -83,6 +83,12 @@ function Etapa0({ avancar }) {
 }
 
 function Etapa1({ avancar }) {
+  const modalidadeTexto = {
+    permanencia: 'Auxílio Permanência',
+    transporte: 'Auxílio Transporte',
+    ambos: 'Ambos (Permanência e Transporte)',
+  }[dados?.auxilio] || 'Não selecionado'; 
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -107,6 +113,9 @@ function Etapa1({ avancar }) {
     <form onSubmit={handleSubmit} className="formulario-inscricao">
       <section>
         <h3>Dados Pessoais</h3>
+        <div className="resumo-modalidade" style={{ marginBottom: '1rem', fontWeight: 'bold' }}>
+          Modalidade selecionada: <span>{modalidadeTexto}</span>
+        </div>
         <div className="campo-formulario">
           <label htmlFor="matricula">Matrícula Ifac *</label>
           <input type="text" id="matricula" name="matricula" placeholder="Ex: Codigo da sua matricula" required />
@@ -847,7 +856,7 @@ export default function Formulario() {
 
   const etapas = [
     <Etapa0 avancar={avancar} />,
-    <Etapa1 avancar={avancar} />,
+    <Etapa1 avancar={avancar} dados={dadosCompletos}/>,
     <Etapa2 avancar={avancar} />,
     <Etapa3 avancar={avancar} />,
     <Etapa4 avancar={avancar} setMembrosGlobal={setMembros} />,
