@@ -93,6 +93,7 @@ function Etapa1({ avancar,dados }) {
     e.preventDefault();
     const fd = new FormData(e.target);
     avancar({
+      auxilio: fd.get('auxilio'),
       matricula: fd.get('matricula'),
       nome: fd.get('nome'),
       cpf: fd.get('cpf'),
