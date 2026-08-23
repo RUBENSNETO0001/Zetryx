@@ -82,7 +82,7 @@ function Etapa0({ avancar }) {
   );
 }
 
-function Etapa1({ avancar }) {
+function Etapa1({ avancar,dados }) {
   const modalidadeTexto = {
     permanencia: 'Auxílio Permanência',
     transporte: 'Auxílio Transporte',
