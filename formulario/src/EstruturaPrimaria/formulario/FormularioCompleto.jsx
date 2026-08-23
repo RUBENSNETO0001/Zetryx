@@ -11,8 +11,7 @@ const ETAPAS = [
   'Documentos',
   'Termo',
 ];
-
-function BarraProgresso({ etapa }) {
+function BarraProgresso({ etapa, setEtapa }) {
   const total = ETAPAS.length;
   const pct = Math.round((etapa / (total - 1)) * 100);
   return (
@@ -30,6 +29,10 @@ function BarraProgresso({ etapa }) {
             key={i}
             className={`etapa-ponto ${i === etapa ? 'ativa' : i < etapa ? 'feita' : ''}`}
             title={nome}
+            style={{ cursor: i <= etapa ? 'pointer' : 'default' }}
+            onClick={() => {
+              if (i <= etapa) setEtapa(i);
+            }}
           >
             {i < etapa ? '✓' : i + 1}
           </div>
@@ -824,10 +827,8 @@ export default function Formulario() {
       }
     });
 
-    // Membros da família como JSON
     formData.append('membros', JSON.stringify(membros));
 
-    // Arquivos binários
     arquivos.forEach(arq => formData.append('documentos', arq));
     
     try {
@@ -839,13 +840,11 @@ export default function Formulario() {
       let resultado = await e.json();
 
       if (!e.ok) {
-        // Exibe a mensagem de erro que vem do backend (ex: erro no MySQL, campo ausente, etc.)
         console.error("Erro na inscrição:", resultado.error);
         alert(`Falha no envio: ${resultado.error || 'Erro desconhecido'}`);
         return;
       }
 
-      // Sucesso na gravação
       console.log("Inscrição realizada com sucesso!", resultado);
       alert("Inscrição realizada com sucesso!");
 
