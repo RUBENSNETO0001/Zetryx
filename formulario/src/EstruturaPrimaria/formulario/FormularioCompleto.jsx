@@ -115,6 +115,7 @@ function Etapa1({ avancar,dados }) {
 
   return (
     <form onSubmit={handleSubmit} className="formulario-inscricao">
+      <input type="hidden" name="auxilio" value={dados?.auxilio || ''} />
       <section>
         <h3>Dados Pessoais</h3>
         <div className="resumo-modalidade" style={{ marginBottom: '1rem', fontWeight: 'bold' }}>
@@ -908,7 +909,7 @@ export default function Formulario() {
 
       {etapa >= 0 && etapa < etapas.length && (
         <>
-          <BarraProgresso etapa={etapa} />
+          <BarraProgresso etapa={etapa} setEtapa={setEtapa}/>
           <div className="container-formulario">
             {etapas[etapa]}
           </div>
