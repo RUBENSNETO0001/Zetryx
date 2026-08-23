@@ -17,7 +17,12 @@ function BarraProgresso({ etapa, setEtapa }) {
   return (
     <div className="barra-progresso-container">
       <div className="barra-progresso-label">
-        <span>{ETAPAS[etapa]}</span>
+        <span 
+          style={{ cursor: 'pointer' }} 
+          onClick={() => setEtapa(0)}
+        >
+          {ETAPAS[etapa]}
+        </span>
         <span>Etapa {etapa + 1} de {total}</span>
       </div>
       <div className="barra-progresso-trilho">
@@ -31,7 +36,7 @@ function BarraProgresso({ etapa, setEtapa }) {
             title={nome}
             style={{ cursor: i <= etapa ? 'pointer' : 'default' }}
             onClick={() => {
-              if (i <= etapa) setEtapa(i);
+              if (i <= etapa) setEtapa(i); 
             }}
           >
             {i < etapa ? '✓' : i + 1}
