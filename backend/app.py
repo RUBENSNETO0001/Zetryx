@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# ── CONFIGURAÇÃO DE CORS DINÂMICA E ROBUSTA ──────────────────────────────────
 raw_origins = os.getenv("ALLOWED_ORIGINS", "https://zetryx-teste.netlify.app,http://localhost:5173")
 origins_list = [origin.strip().rstrip('/') for origin in raw_origins.split(",") if origin.strip()]
 
@@ -31,14 +30,14 @@ for default_origin in ["https://zetryx-teste.netlify.app", "http://localhost:517
     if default_origin not in origins_list:
         origins_list.append(default_origin)
 
+# Aplicação do CORS global de forma direta
 CORS(
     app,
     resources={r"/*": {"origins": origins_list}},
     supports_credentials=True,
-    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Headers"],
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Headers", "Origin"],
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 )
-
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -165,6 +164,19 @@ def handle_unexpected_error(e):
     response.headers.add('Access-Control-Allow-Origin', allowed_origin)
     return response, code
 
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        origin = request.headers.get("Origin")
+        response = app.make_default_options_response()
+        if origin in origins_list:
+            response.headers["Access-Control-Allow-Origin"] = origin
+        else:
+            response.headers["Access-Control-Allow-Origin"] = origins_list[0]
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response, 200
 # ── AUXILIARES DE TRATAMENTO DE DADOS ─────────────────────────────────────────
 
 def _str(value, max_len: int = 255) -> str | None:
@@ -491,3 +503,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_DEBUG', 'False').lower() in ['true', '1', 't']
     app.run(host='0.0.0.0', port=port, debug=debug)
+
+    
