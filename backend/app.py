@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
+# Configuração das origens permitidas
 raw_origins = os.getenv("ALLOWED_ORIGINS", "https://zetryx-teste.netlify.app,http://localhost:5173")
 origins_list = [origin.strip().rstrip('/') for origin in raw_origins.split(",") if origin.strip()]
 
@@ -30,7 +31,7 @@ for default_origin in ["https://zetryx-teste.netlify.app", "http://localhost:517
     if default_origin not in origins_list:
         origins_list.append(default_origin)
 
-# Aplicação do CORS global de forma direta
+# Aplicação global do CORS
 CORS(
     app,
     resources={r"/*": {"origins": origins_list}},
@@ -38,6 +39,24 @@ CORS(
     allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Headers", "Origin"],
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 )
+
+# Trata a requisição preflight (OPTIONS) antes de qualquer rota
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        origin = request.headers.get("Origin")
+        response = app.make_default_options_response()
+        
+        if origin and origin in origins_list:
+            response.headers["Access-Control-Allow-Origin"] = origin
+        else:
+            response.headers["Access-Control-Allow-Origin"] = origins_list[0]
+            
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response, 200
+    
 limiter = Limiter(
     get_remote_address,
     app=app,
