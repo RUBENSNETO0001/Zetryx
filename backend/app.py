@@ -10,11 +10,11 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 import mysql.connector
 
 load_dotenv()
 
-# Configuração de Logs
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -23,8 +23,21 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+# ── CONFIGURAÇÃO DE CORS DINÂMICA E ROBUSTA ──────────────────────────────────
+raw_origins = os.getenv("ALLOWED_ORIGINS", "https://zetryx-teste.netlify.app,http://localhost:5173")
+origins_list = [origin.strip().rstrip('/') for origin in raw_origins.split(",") if origin.strip()]
+
+for default_origin in ["https://zetryx-teste.netlify.app", "http://localhost:5173"]:
+    if default_origin not in origins_list:
+        origins_list.append(default_origin)
+
+CORS(
+    app,
+    resources={r"/*": {"origins": origins_list}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Headers"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+)
 
 limiter = Limiter(
     get_remote_address,
@@ -44,7 +57,6 @@ def _get_db_port():
 
 
 def _split_host_port(host_str, fallback_port):
-    """Blinda contra host vindo como 'host:porta' junto (causa do erro 2003)."""
     if host_str and ":" in str(host_str):
         h, _, p = str(host_str).rpartition(":")
         try:
@@ -54,7 +66,6 @@ def _split_host_port(host_str, fallback_port):
     return host_str, int(fallback_port)
 
 
-# Suporte automático para MYSQL_URL do Railway
 raw_host = os.getenv("DB_HOST") or os.getenv("MYSQLHOST")
 
 if not raw_host and (os.getenv("MYSQL_URL") or os.getenv("DATABASE_URL")):
@@ -105,7 +116,6 @@ ALLOWED_MIME_TYPES = {
 
 
 def allowed_file(filename: str) -> bool:
-    """Verifica extensão do arquivo."""
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_MIME_TYPES
 
 
@@ -121,6 +131,33 @@ def get_db():
     return mysql.connector.connect(**DB_CONFIG)
 
 
+# ── HANDLERS DE ERRO GLOBAIS COM CABEÇALHOS CORS ─────────────────────────────
+
+@app.errorhandler(413)
+@app.errorhandler(RequestEntityTooLarge)
+def handle_large_file(e):
+    origin = request.headers.get('Origin')
+    allowed_origin = origin if origin in origins_list else origins_list[0]
+    response = jsonify({"success": False, "error": f"O tamanho dos arquivos excede o limite de {MAX_UPLOAD_SIZE_MB}MB."})
+    response.headers.add('Access-Control-Allow-Origin', allowed_origin)
+    return response, 413
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(e):
+    logger.error("Erro não tratado no servidor: %s", e, exc_info=True)
+    origin = request.headers.get('Origin')
+    allowed_origin = origin if origin in origins_list else origins_list[0]
+    
+    code = 500
+    msg = str(e)
+    if isinstance(e, HTTPException):
+        code = e.code
+        msg = e.description
+
+    response = jsonify({"success": False, "error": f"Erro interno do servidor: {msg}"})
+    response.headers.add('Access-Control-Allow-Origin', allowed_origin)
+    return response, code
+
 # ── AUXILIARES DE TRATAMENTO DE DADOS ─────────────────────────────────────────
 
 def _str(value, max_len: int = 255) -> str | None:
@@ -131,7 +168,6 @@ def _str(value, max_len: int = 255) -> str | None:
 
 
 def _date_safe(value):
-    """Garante que strings vazias de datas sejam tratadas como None (NULL)."""
     if not value or not str(value).strip():
         return None
     return str(value).strip()
@@ -191,10 +227,12 @@ def home():
 
 @app.route('/api/inscricao', methods=['GET', 'POST', 'OPTIONS'])
 def inscricao():
-    # Trata o preflight CORS explicitamente
+    origin = request.headers.get('Origin')
+    allowed_origin = origin if origin in origins_list else origins_list[0]
+
     if request.method == 'OPTIONS':
         response = jsonify({"status": "ok"})
-        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Origin", allowed_origin)
         response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
         response.headers.add("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
         return response, 200
@@ -202,11 +240,9 @@ def inscricao():
     if request.method == 'GET':
         return jsonify({"message": "Endpoint de inscrição ativo. Envie os dados via POST."}), 200
 
-    # Processamento do formulário (POST)
     conn = None
     cursor = None
     try:
-        # Validação mínima dos campos obrigatórios
         required_fields = ["matricula", "nome", "cpf", "email"]
         missing = [f for f in required_fields if not request.form.get(f)]
         if missing:
@@ -388,7 +424,7 @@ def inscricao():
                 1 if m.get("possuiDoencaCronica") else 0,
             ))
 
-        # 11. DOCUMENTOS — verificação e salvamento
+        # 11. DOCUMENTOS
         arquivos = request.files.getlist("documentos")
         for arquivo in arquivos:
             if not arquivo or not arquivo.filename:
@@ -418,7 +454,7 @@ def inscricao():
         if conn:
             conn.rollback()
         if e.errno == 1062:
-            return jsonify({"success": False, "error": "Matrícula já cadastrada."}), 409
+            return jsonify({"success": False, "error": "Matrícula ou CPF já cadastrado."}), 409
         logger.error("Erro de integridade: %s", e, exc_info=True)
         return jsonify({"success": False, "error": f"Erro de integridade nos dados: {e}"}), 400
 
@@ -426,7 +462,7 @@ def inscricao():
         if conn:
             conn.rollback()
         logger.error("Erro na inscrição: %s", e, exc_info=True)
-        return jsonify({"success": False, "error": str(e)}), 500
+        raise e
 
     finally:
         if cursor:
