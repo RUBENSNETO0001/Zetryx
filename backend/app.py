@@ -223,11 +223,6 @@ def _resolver_banco(cursor, codigo, nome_outro=None):
 def _mapear_qtd_disciplinas(valor: str) -> int:
     mapa = {"uma": 1, "duas": 2, "mais_duas": 3, "tcc": 0, "estagio": 0}
     return mapa.get(valor, 1)
-    origin = request.headers.get('Origin')
-    allowed_origin = origin if origin in origins_list else origins_list[0]
-    response = jsonify({"success": False, "error": "Rota não encontrada (404)."})
-    response.headers.add('Access-Control-Allow-Origin', allowed_origin)
-    return response, 404
 
 # ── ROTAS DA API ──────────────────────────────────────────────────────────────
 
