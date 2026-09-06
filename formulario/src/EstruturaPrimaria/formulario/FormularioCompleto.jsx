@@ -128,46 +128,51 @@ function Etapa1({ avancar,dados }) {
         </div>
         <div className="campo-formulario">
           <label htmlFor="matricula">Matrícula Ifac *</label>
-          <input type="text" id="matricula" name="matricula" placeholder="Ex: Codigo da sua matricula" required />
+          <input type="text" id="matricula" name="matricula" placeholder="Ex: Codigo da sua matricula" defaultValue={dados?.matricula || ''} required />
           <span className="campo-dica">Sua matrícula institucional no Ifac</span>
         </div>
         <div className="campo-formulario">
           <label htmlFor="nome">Nome Completo *</label>
-          <input type="text" id="nome" name="nome" placeholder="Insira seu nome completo" required />
+          <input type="text" id="nome" name="nome" placeholder="Insira seu nome completo" defaultValue={dados?.nome || ''} required />
         </div>
         <div className="campo-formulario">
           <label htmlFor="cpf">CPF *</label>
-          <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required />
+          <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" defaultValue={dados?.cpf || ''} required />
         </div>
         <div className="campo-formulario">
           <label htmlFor="dataNascimento">Data de Nascimento *</label>
-          <input type="date" id="dataNascimento" name="dataNascimento" required />
+          <input type="date" id="dataNascimento" name="dataNascimento" defaultValue={dados?.dataNascimento || ''} required />
         </div>
         <div className="campo-formulario">
           <label>Estado civil:</label>
           <div className="opcoes-grupo">
             {['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'União Estável'].map((e) => (
               <label key={e} className="opcao-item">
-                <input type="radio" name="estadoCivil" value={e.toLowerCase()} /> {e}
+                <input type="radio" name="estadoCivil" value={e.toLowerCase()} defaultChecked={dados?.estadoCivil === e.toLowerCase()} /> {e}
               </label>
             ))}
             <label className="opcao-item">
-              <input type="radio" name="estadoCivil" value="outro" />
+              <input
+                type="radio"
+                name="estadoCivil"
+                value="outro"
+                defaultChecked={!!dados?.estadoCivil && !['solteiro(a)', 'casado(a)', 'divorciado(a)', 'união estável'].includes(dados.estadoCivil)}
+              />
               Outro:
-              <input type="text" name="estadoCivilOutro" className="input-inline" />
+              <input type="text" name="estadoCivilOutro" className="input-inline" defaultValue={dados?.estadoCivil && !['solteiro(a)', 'casado(a)', 'divorciado(a)', 'união estável'].includes(dados.estadoCivil) ? dados.estadoCivil : ''} />
             </label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Concorre às vagas destinadas às pessoas com deficiência?</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="pcd" value="sim" /> Sim</label>
-            <label className="opcao-item"><input type="radio" name="pcd" value="nao" /> Não</label>
+            <label className="opcao-item"><input type="radio" name="pcd" value="sim" defaultChecked={dados?.pcd === 'sim'} /> Sim</label>
+            <label className="opcao-item"><input type="radio" name="pcd" value="nao" defaultChecked={dados?.pcd === 'nao'} /> Não</label>
           </div>
         </div>
         <div className="campo-formulario">
           <label htmlFor="telefone">Telefone para contato</label>
-          <input type="tel" id="telefone" name="telefone" placeholder="(68) 99999-9999" />
+          <input type="tel" id="telefone" name="telefone" placeholder="(68) 99999-9999" defaultValue={dados?.telefone || ''} />
         </div>
       </section>
       <hr />
@@ -183,7 +188,7 @@ function Etapa1({ avancar,dados }) {
         ].map(([id, type, label, ph, req]) => (
           <div className="campo-formulario" key={id}>
             <label htmlFor={id}>{label}</label>
-            <input type={type} id={id} name={id} placeholder={ph} required={req} />
+            <input type={type} id={id} name={id} placeholder={ph} defaultValue={dados?.[id] || ''} required={req} />
           </div>
         ))}
       </section>
@@ -192,7 +197,7 @@ function Etapa1({ avancar,dados }) {
   );
 }
 
-function Etapa2({ avancar }) {
+function Etapa2({ avancar, dados }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -252,7 +257,7 @@ function Etapa2({ avancar }) {
             <div className="opcoes-grupo">
               {opcoes.map(([val, txt]) => (
                 <label key={val} className="opcao-item">
-                  <input type="radio" name={name} value={val} required /> {txt}
+                  <input type="radio" name={name} value={val} defaultChecked={dados?.[name] === val} required /> {txt}
                 </label>
               ))}
             </div>
@@ -264,7 +269,7 @@ function Etapa2({ avancar }) {
   );
 }
 
-function Etapa3({ avancar }) {
+function Etapa3({ avancar, dados }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -297,8 +302,8 @@ function Etapa3({ avancar }) {
         <div className="campo-formulario">
           <label>Possui conta bancária? *</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="possuiConta" value="sim" required /> Sim</label>
-            <label className="opcao-item"><input type="radio" name="possuiConta" value="nao" /> Não</label>
+            <label className="opcao-item"><input type="radio" name="possuiConta" value="sim" defaultChecked={dados?.possuiConta === 'sim'} required /> Sim</label>
+            <label className="opcao-item"><input type="radio" name="possuiConta" value="nao" defaultChecked={dados?.possuiConta === 'nao'} /> Não</label>
           </div>
         </div>
         <div className="campo-formulario">
@@ -306,33 +311,33 @@ function Etapa3({ avancar }) {
           <div className="opcoes-grupo">
             {bancos.map(([val, txt]) => (
               <label key={val} className="opcao-item">
-                <input type="radio" name="nomeBanco" value={val} /> {txt}
+                <input type="radio" name="nomeBanco" value={val} defaultChecked={dados?.nomeBanco === val} /> {txt}
               </label>
             ))}
             <label className="opcao-item">
-              <input type="radio" name="nomeBanco" value="outro" /> Outro:
-              <input type="text" name="bancoOutro" className="input-inline" placeholder="Especifique" />
+              <input type="radio" name="nomeBanco" value="outro" defaultChecked={dados?.nomeBanco === 'outro'} /> Outro:
+              <input type="text" name="bancoOutro" className="input-inline" placeholder="Especifique" defaultValue={dados?.bancoOutro || ''} />
             </label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Tipo de Conta</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="tipoConta" value="corrente" /> Corrente</label>
-            <label className="opcao-item"><input type="radio" name="tipoConta" value="poupanca" /> Poupança</label>
+            <label className="opcao-item"><input type="radio" name="tipoConta" value="corrente" defaultChecked={dados?.tipoConta === 'corrente'} /> Corrente</label>
+            <label className="opcao-item"><input type="radio" name="tipoConta" value="poupanca" defaultChecked={dados?.tipoConta === 'poupanca'} /> Poupança</label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Variação da Poupança <span className="campo-dica-inline">(apenas para Poupança BB)</span></label>
-          <input type="text" name="variacaoPoupanca" className="input-texto-linha" placeholder="Ex: 1288" />
+          <input type="text" name="variacaoPoupanca" className="input-texto-linha" placeholder="Ex: 1288" defaultValue={dados?.variacaoPoupanca || ''} />
         </div>
         <div className="campo-formulario">
           <label>Número da Agência</label>
-          <input type="text" name="numeroAgencia" className="input-texto-linha" placeholder="Ex: 111" />
+          <input type="text" name="numeroAgencia" className="input-texto-linha" placeholder="Ex: 111" defaultValue={dados?.numeroAgencia || ''} />
         </div>
         <div className="campo-formulario">
           <label>Número da Conta <span className="campo-dica-inline">(para Poupança BB, informar como está no contrato)</span></label>
-          <input type="text" name="numeroConta" className="input-texto-linha" placeholder="Ex: 12345-6" />
+          <input type="text" name="numeroConta" className="input-texto-linha" placeholder="Ex: 12345-6" defaultValue={dados?.numeroConta || ''} />
         </div>
       </section>
       <button type="submit" className="btn-enviar">Próxima etapa →</button>
@@ -420,8 +425,10 @@ function CardMembro({ index, membro, onChange, onRemover, podRemover }) {
   );
 }
 
-function Etapa4({ avancar, setMembrosGlobal }) {
-  const [membros, setMembros] = useState([{ ...MEMBRO_VAZIO }]);
+function Etapa4({ avancar, dados, membrosSalvos, setMembrosGlobal }) {
+  const [membros, setMembros] = useState(
+    membrosSalvos && membrosSalvos.length > 0 ? membrosSalvos : [{ ...MEMBRO_VAZIO }]
+  );
 
   const handleMembro = (index, campo, valor) =>
     setMembros(prev => prev.map((m, i) => i === index ? { ...m, [campo]: valor } : m));
@@ -437,6 +444,8 @@ function Etapa4({ avancar, setMembrosGlobal }) {
       qtdDisciplinas: fd.get('qtdDisciplinas'),
       recebeAuxilio: fd.get('recebeAuxilio'),
       tipoBolsa: fd.getAll('tipoBolsa').join(','),
+      pcdFamilia: fd.getAll('pcdFamilia').join(','),
+      doencaFamilia: fd.getAll('doencaFamilia').join(','),
       tipoMoradia: fd.get('tipoMoradia'),
       zonaResidencia: fd.get('zonaResidencia'),
       bolsaFamilia: fd.get('bolsaFamilia'),
@@ -464,7 +473,7 @@ function Etapa4({ avancar, setMembrosGlobal }) {
               ['estagio', 'Apenas fazendo estágio curricular'],
             ].map(([v, t]) => (
               <label key={v} className="opcao-item">
-                <input type="radio" name="qtdDisciplinas" value={v} required /> {t}
+                <input type="radio" name="qtdDisciplinas" value={v} defaultChecked={dados?.qtdDisciplinas === v} required /> {t}
               </label>
             ))}
           </div>
@@ -472,8 +481,8 @@ function Etapa4({ avancar, setMembrosGlobal }) {
         <div className="campo-formulario">
           <label>Você recebe algum auxílio ou bolsa no Ifac? *</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="recebeAuxilio" value="nao" required /> Não</label>
-            <label className="opcao-item"><input type="radio" name="recebeAuxilio" value="sim" /> Sim</label>
+            <label className="opcao-item"><input type="radio" name="recebeAuxilio" value="nao" defaultChecked={dados?.recebeAuxilio === 'nao'} required /> Não</label>
+            <label className="opcao-item"><input type="radio" name="recebeAuxilio" value="sim" defaultChecked={dados?.recebeAuxilio === 'sim'} /> Sim</label>
           </div>
         </div>
         <div className="campo-formulario">
@@ -489,7 +498,7 @@ function Etapa4({ avancar, setMembrosGlobal }) {
               ['pe-de-meia', 'Pé-de-meia'],
             ].map(([v, t]) => (
               <label key={v} className="opcao-item">
-                <input type="checkbox" name="tipoBolsa" value={v} /> {t}
+                <input type="checkbox" name="tipoBolsa" value={v} defaultChecked={dados?.tipoBolsa?.split(',').includes(v)} /> {t}
               </label>
             ))}
           </div>
@@ -512,7 +521,7 @@ function Etapa4({ avancar, setMembrosGlobal }) {
               ['tgd', 'Transtorno Global de Desenvolvimento'],
               ['fisica', 'Deficiência física'],
             ].map(([v, t]) => (
-              <label key={v} className="opcao-item"><input type="checkbox" name="pcdFamilia" value={v} /> {t}</label>
+              <label key={v} className="opcao-item"><input type="checkbox" name="pcdFamilia" value={v} defaultChecked={dados?.pcdFamilia?.split(',').includes(v)} /> {t}</label>
             ))}
           </div>
         </div>
@@ -532,45 +541,45 @@ function Etapa4({ avancar, setMembrosGlobal }) {
               ['aids', 'AIDS'],
               ['esclerose', 'Esclerose múltipla'],
             ].map(([v, t]) => (
-              <label key={v} className="opcao-item"><input type="checkbox" name="doencaFamilia" value={v} /> {t}</label>
+              <label key={v} className="opcao-item"><input type="checkbox" name="doencaFamilia" value={v} defaultChecked={dados?.doencaFamilia?.split(',').includes(v)} /> {t}</label>
             ))}
           </div>
         </div>
         <div className="campo-formulario">
           <label>Qual é o tipo de sua moradia? *</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="alugada_financiada" required /> Alugada ou financiada</label>
-            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="propria_cedida" /> Própria ou cedida</label>
+            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="alugada_financiada" defaultChecked={dados?.tipoMoradia === 'alugada_financiada'} required /> Alugada ou financiada</label>
+            <label className="opcao-item"><input type="radio" name="tipoMoradia" value="propria_cedida" defaultChecked={dados?.tipoMoradia === 'propria_cedida'} /> Própria ou cedida</label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Mora em: *</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="zonaResidencia" value="urbana" required /> Zona urbana</label>
-            <label className="opcao-item"><input type="radio" name="zonaResidencia" value="rural" /> Zona rural</label>
+            <label className="opcao-item"><input type="radio" name="zonaResidencia" value="urbana" defaultChecked={dados?.zonaResidencia === 'urbana'} required /> Zona urbana</label>
+            <label className="opcao-item"><input type="radio" name="zonaResidencia" value="rural" defaultChecked={dados?.zonaResidencia === 'rural'} /> Zona rural</label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Sua família é beneficiária do Bolsa Família ou inscrita no Cadúnico? *</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="bolsaFamilia" value="sim" required /> Sim</label>
-            <label className="opcao-item"><input type="radio" name="bolsaFamilia" value="nao" /> Não</label>
+            <label className="opcao-item"><input type="radio" name="bolsaFamilia" value="sim" defaultChecked={dados?.bolsaFamilia === 'sim'} required /> Sim</label>
+            <label className="opcao-item"><input type="radio" name="bolsaFamilia" value="nao" defaultChecked={dados?.bolsaFamilia === 'nao'} /> Não</label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Sua família é beneficiária do BPC (Benefício de Prestação Continuada)? *</label>
           <div className="opcoes-grupo">
-            <label className="opcao-item"><input type="radio" name="beneficioBpc" value="sim" required /> Sim</label>
-            <label className="opcao-item"><input type="radio" name="beneficioBpc" value="nao" /> Não</label>
+            <label className="opcao-item"><input type="radio" name="beneficioBpc" value="sim" defaultChecked={dados?.beneficioBpc === 'sim'} required /> Sim</label>
+            <label className="opcao-item"><input type="radio" name="beneficioBpc" value="nao" defaultChecked={dados?.beneficioBpc === 'nao'} /> Não</label>
           </div>
         </div>
         <div className="campo-formulario">
           <label>Qual a renda bruta TOTAL da família neste momento? (Apenas valor inteiro) *</label>
-          <input type="number" name="rendaBruta" placeholder="0" required className="input-linha" />
+          <input type="number" name="rendaBruta" placeholder="0" defaultValue={dados?.rendaBruta || ''} required className="input-linha" />
         </div>
         <div className="campo-formulario">
           <label>Quantas pessoas moram na sua casa (incluindo você)? *</label>
-          <input type="number" name="qtdPessoas" placeholder="1" required className="input-linha" />
+          <input type="number" name="qtdPessoas" placeholder="1" defaultValue={dados?.qtdPessoas || ''} required className="input-linha" />
         </div>
       </section>
 
@@ -605,7 +614,7 @@ function Etapa4({ avancar, setMembrosGlobal }) {
   );
 }
 
-function Etapa5({ avancar }) {
+function Etapa5({ avancar, dados }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -634,14 +643,14 @@ function Etapa5({ avancar }) {
           <div className="opcoes-grupo">
             {cursos.map(([v, t]) => (
               <label key={v} className="opcao-item">
-                <input type="radio" name="cursoSuperior" value={v} required /> {t}
+                <input type="radio" name="cursoSuperior" value={v} defaultChecked={dados?.cursoSuperior === v} required /> {t}
               </label>
             ))}
           </div>
         </div>
         <div className="campo-formulario">
           <label>Se selecionou "Outro", especifique:</label>
-          <input type="text" name="cursoSuperiorOutro" className="input-texto-linha" placeholder="Nome do curso" />
+          <input type="text" name="cursoSuperiorOutro" className="input-texto-linha" placeholder="Nome do curso" defaultValue={dados?.cursoSuperiorOutro || ''} />
         </div>
       </section>
       <button type="submit" className="btn-enviar">Próxima etapa →</button>
@@ -862,11 +871,11 @@ export default function Formulario() {
 
   const etapas = [
     <Etapa0 avancar={avancar} />,
-    <Etapa1 avancar={avancar} dados={dadosCompletos}/>,
-    <Etapa2 avancar={avancar} />,
-    <Etapa3 avancar={avancar} />,
-    <Etapa4 avancar={avancar} setMembrosGlobal={setMembros} />,
-    <Etapa5 avancar={avancar} />,
+    <Etapa1 avancar={avancar} dados={dadosCompletos} />,
+    <Etapa2 avancar={avancar} dados={dadosCompletos} />,
+    <Etapa3 avancar={avancar} dados={dadosCompletos} />,
+    <Etapa4 avancar={avancar} dados={dadosCompletos} membrosSalvos={membros} setMembrosGlobal={setMembros} />,
+    <Etapa5 avancar={avancar} dados={dadosCompletos} />,
     <Etapa6 avancar={avancar} setArquivosGlobal={setArquivos} />,
     <Etapa7 avancar={enviarInscricao} enviando={enviando} erro={erroEnvio} />,
   ];
