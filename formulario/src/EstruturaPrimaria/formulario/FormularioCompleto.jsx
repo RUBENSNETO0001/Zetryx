@@ -768,7 +768,6 @@ function Etapa7({ avancar, enviando, erro }) {
     e.preventDefault();
     avancar({ aceiteTermo: true });
   };
-
   return (
     <form onSubmit={handleSubmit} className="formulario-inscricao">
       <section className="secao-termo">
@@ -878,6 +877,8 @@ export default function Formulario() {
     <Etapa5 avancar={avancar} dados={dadosCompletos} />,
     <Etapa6 avancar={avancar} setArquivosGlobal={setArquivos} />,
     <Etapa7 avancar={enviarInscricao} enviando={enviando} erro={erroEnvio} />,
+
+    <TelaSucesso/>,
   ];
 
   return (
