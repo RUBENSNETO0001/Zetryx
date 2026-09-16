@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Configuração das origens permitidas
 raw_origins = os.getenv("ALLOWED_ORIGINS", "https://zetryx-teste.netlify.app,http://localhost:5173")
 origins_list = [origin.strip().rstrip('/') for origin in raw_origins.split(",") if origin.strip()]
 
@@ -31,7 +30,6 @@ for default_origin in ["https://zetryx-teste.netlify.app", "http://localhost:517
     if default_origin not in origins_list:
         origins_list.append(default_origin)
 
-# Aplicação global do CORS
 CORS(
     app,
     resources={r"/*": {"origins": origins_list}},
@@ -40,7 +38,6 @@ CORS(
     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 )
 
-# Trata a requisição preflight (OPTIONS) antes de qualquer rota
 @app.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
@@ -63,8 +60,6 @@ limiter = Limiter(
     default_limits=[],
     storage_uri="memory://",
 )
-
-# ── TRATAMENTO E CONEXÃO AO BANCO DE DADOS ────────────────────────────────────
 
 def _get_db_port():
     port_val = os.getenv("MYSQLPORT") or os.getenv("DB_PORT", "3306")
@@ -114,8 +109,6 @@ logger.info(
     DB_CONFIG["host"], DB_CONFIG["port"], DB_CONFIG["database"]
 )
 
-# ── UPLOAD DE ARQUIVOS ────────────────────────────────────────────────────────
-
 UPLOAD_FOLDER = os.getenv(
     "UPLOAD_FOLDER",
     os.path.join(os.path.expanduser("~"), "uploads"),
@@ -149,7 +142,6 @@ def get_db():
     return mysql.connector.connect(**DB_CONFIG)
 
 
-# ── HANDLERS DE ERRO GLOBAIS COM CABEÇALHOS CORS ─────────────────────────────
 @app.errorhandler(404)
 def handle_404_error(e):
     origin = request.headers.get('Origin')
@@ -196,7 +188,6 @@ def handle_preflight():
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Credentials"] = "true"
         return response, 200
-# ── AUXILIARES DE TRATAMENTO DE DADOS ─────────────────────────────────────────
 
 def _str(value, max_len: int = 255) -> str | None:
     if value is None:
@@ -255,7 +246,6 @@ def _mapear_qtd_disciplinas(valor: str) -> int:
     mapa = {"uma": 1, "duas": 2, "mais_duas": 3, "tcc": 0, "estagio": 0}
     return mapa.get(valor, 1)
 
-# ── ROTAS DA API ──────────────────────────────────────────────────────────────
 
 @app.route('/')
 def home():
@@ -505,8 +495,7 @@ def inscricao():
             cursor.close()
         if conn:
             conn.close()
-
-
+  
 @app.route("/api/health", methods=["GET"])
 def health():
     try:
