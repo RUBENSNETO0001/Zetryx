@@ -846,7 +846,7 @@ export default function Formulario() {
     arquivos.forEach(arq => formData.append('documentos', arq));
     
     try {
-      let e = await fetch(`https://zetryx-production.up.railway.app/api/inscricao`, {
+      let e = await fetch(`http://localhost:5000/api/inscricao`, {
         method: `POST`,
         body: formData,
       });
